@@ -2,8 +2,6 @@
 
 Vou criar uma POC (Prova de Conceito) completa e didática para implementar o ERC-4337. Vamos dividir em partes claras para facilitar o entendimento.
 
-# POC Completa de Implementação do ERC-4337
-
 ## Estrutura do Projeto
 
 Primeiro, vamos criar a estrutura do nosso projeto:
@@ -23,6 +21,44 @@ erc4337-poc/
 ├── hardhat.config.js
 └── package.json
 ```
+
+## Casos de test
+
+O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios críticos e habilitando novos casos de uso.
+
+## 1. **Carteiras Inteligentes com Recuperação Social**
+- Permite redefinir chaves perdidas usando métodos como verificação por dispositivos confiáveis ou contatos predefinidos, eliminando a dependência de frases-semente[5][4].
+- Exemplo: Recuperação via autenticação em dois fatores (2FA) ou biometria (digital/facial)[1][5].
+
+## 2. **Transações Sem Custos de Gas (Gasless Transactions)**
+- Terceiros (como aplicativos ou patrocinadores) podem pagar taxas de rede, permitindo que usuários interajam com dApps sem precisar de ETH para gas[2][4].
+- Caso de uso: Promoções em jogos NFTs onde a plataforma subsidia o minting[1][5].
+
+## 3. **Assinaturas Múltiplas e Controles Personalizados**
+- Crie regras complexas para transações, como exigir aprovação de múltiplas partes (ex: 2 de 3 assinaturas) ou limitar valores diários[4][5].
+- Aplicação: Gestão de fundos corporativos ou tesourarias DAO com requisitos de segurança elevados[1][4].
+
+## 4. **Pagamentos Recorrentes e Assinaturas**
+- Automatize transações periódicas (ex: assinaturas de serviços) sem intervenção manual, usando lógica programável em contratos inteligentes[4][5].
+- Exemplo: Plataformas de streaming descentralizadas com cobrança mensal automática[1].
+
+## 5. **Experiência Simplificada para Novos Usuários**
+- Criação de contas com autenticação biométrica (digital/facial) em smartphones, substituindo frases-semente complexas[1][5].
+- Impacto: Redução de barreiras para adoção em massa, especialmente para usuários não técnicos[1][4].
+
+## 6. **Interações em Lote (Batch Transactions)**
+- Execute múltiplas ações em uma única transação (ex: comprar NFT e aprovar token em um passo), reduzindo custos e complexidade[2][4].
+- Uso prático: Mercados descentralizados que combinam transferência e listagem de ativos[1].
+
+## 7. **Gestão Avançada de Ativos em Jogos e Metaverso**
+- Contratos inteligentes gerenciam portfólios de usuários, permitindo transações automáticas de itens dentro de jogos ou mundos virtuais[1][3].
+- Exemplo: Venda de terrenos virtuais (representados por NFTs) com pagamento parcelado via smart contracts[3][5].
+
+### Benefícios Gerais para Adoção em Massa
+- **Segurança reforçada:** Menos riscos de perda de chaves e fraudes[4][5].
+- **Custos reduzidos:** Modelos de pagamento inovadores (ex: pay-as-you-go)[1][4].
+- **Interoperabilidade:** Identidades e ativos portáveis entre diferentes dApps[3][5].
+
 
 ## Parte 1: Configuração do Projeto
 
