@@ -26,31 +26,31 @@ erc4337-poc/
 
 O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios críticos e habilitando novos casos de uso.
 
-## 1. **Carteiras Inteligentes com Recuperação Social**
+- [x] 1. **Carteiras Inteligentes com Recuperação Social**
 - Permite redefinir chaves perdidas usando métodos como verificação por dispositivos confiáveis ou contatos predefinidos, eliminando a dependência de frases-semente[5][4].
 - Exemplo: Recuperação via autenticação em dois fatores (2FA) ou biometria (digital/facial)[1][5].
 
-## 2. **Transações Sem Custos de Gas (Gasless Transactions)**
+- [x] 2. **Transações Sem Custos de Gas (Gasless Transactions)**
 - Terceiros (como aplicativos ou patrocinadores) podem pagar taxas de rede, permitindo que usuários interajam com dApps sem precisar de ETH para gas[2][4].
 - Caso de uso: Promoções em jogos NFTs onde a plataforma subsidia o minting[1][5].
 
-## 3. **Assinaturas Múltiplas e Controles Personalizados**
+- [x] 3. **Assinaturas Múltiplas e Controles Personalizados**
 - Crie regras complexas para transações, como exigir aprovação de múltiplas partes (ex: 2 de 3 assinaturas) ou limitar valores diários[4][5].
 - Aplicação: Gestão de fundos corporativos ou tesourarias DAO com requisitos de segurança elevados[1][4].
 
-## 4. **Pagamentos Recorrentes e Assinaturas**
+- [x] 4. **Pagamentos Recorrentes e Assinaturas**
 - Automatize transações periódicas (ex: assinaturas de serviços) sem intervenção manual, usando lógica programável em contratos inteligentes[4][5].
 - Exemplo: Plataformas de streaming descentralizadas com cobrança mensal automática[1].
 
-## 5. **Experiência Simplificada para Novos Usuários**
+- [ ] 5. **Experiência Simplificada para Novos Usuários**
 - Criação de contas com autenticação biométrica (digital/facial) em smartphones, substituindo frases-semente complexas[1][5].
 - Impacto: Redução de barreiras para adoção em massa, especialmente para usuários não técnicos[1][4].
 
-## 6. **Interações em Lote (Batch Transactions)**
+- [ ] 6. **Interações em Lote (Batch Transactions)**
 - Execute múltiplas ações em uma única transação (ex: comprar NFT e aprovar token em um passo), reduzindo custos e complexidade[2][4].
 - Uso prático: Mercados descentralizados que combinam transferência e listagem de ativos[1].
 
-## 7. **Gestão Avançada de Ativos em Jogos e Metaverso**
+- [ ] 7. **Gestão Avançada de Ativos em Jogos e Metaverso**
 - Contratos inteligentes gerenciam portfólios de usuários, permitindo transações automáticas de itens dentro de jogos ou mundos virtuais[1][3].
 - Exemplo: Venda de terrenos virtuais (representados por NFTs) com pagamento parcelado via smart contracts[3][5].
 
@@ -59,6 +59,206 @@ O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios
 - **Custos reduzidos:** Modelos de pagamento inovadores (ex: pay-as-you-go)[1][4].
 - **Interoperabilidade:** Identidades e ativos portáveis entre diferentes dApps[3][5].
 
+## Transações Sem Custos de Gas (Gasless Transactions)
+
+Esta funcionalidade já está implementada no projeto. Veja como usar:
+
+### 1. Implantar o SponsorPaymaster
+
+```bash
+npx hardhat run scripts/deploySponsorPaymaster.js --network localhost
+```
+
+### 2. Patrocinar uma conta ou aplicativo
+
+Para patrocinar uma conta (smart account):
+```bash
+npx hardhat run scripts/sponsorAccount.js --network localhost -- address 0xSuaContaSmartAqui
+```
+
+Para patrocinar um aplicativo (contrato alvo):
+```bash
+npx hardhat run scripts/sponsorAccount.js --network localhost -- app 0xSeuAplicativoAqui
+```
+
+### 3. Enviar transação sem custos de gas
+
+```bash
+npx hardhat run scripts/sendGaslessTransaction.js --network localhost -- 0xSuaContaSmartAqui 0xEnderecoAlvo valorEmWei
+```
+
+O SponsorPaymaster cobrirá os custos de gas para todas as transações enviadas por contas ou para aplicativos patrocinados, eliminando a necessidade de os usuários possuírem ETH para interagir com dApps.
+
+### Como funciona
+
+1. O SponsorPaymaster é uma implementação de BasePaymaster do ERC-4337
+2. Ele mantém registros de contas e aplicativos patrocinados
+3. Quando uma UserOperation é enviada através do EntryPoint, o paymaster verifica se o remetente ou o destino está na lista de patrocinados
+4. Se estiver, o paymaster paga as taxas de gas em nome do usuário
+5. O financiador do paymaster (dono do contrato) é quem arca com os custos de gas
+
+Esse modelo é particularmente útil para:
+- Onboarding de novos usuários (que não possuem ETH)
+- Promoções em jogos NFT (mint sem custo de gas)
+- Melhorar a experiência do usuário em dApps
+
+## Assinaturas Múltiplas e Controles Personalizados
+
+Esta funcionalidade já está implementada no projeto. Veja como usar:
+
+### 1. Implantar a MultiSigAccountFactory
+
+```bash
+npx hardhat run scripts/deployMultiSigFactory.js --network localhost
+```
+
+### 2. Criar uma conta MultiSig
+
+```bash
+# Formato: npx hardhat run scripts/createMultiSigAccount.js -- <threshold> <dailyLimit> <txLimit> <owner1,owner2,...>
+# Exemplo para carteira 2-de-3 com limite diário de 1 ETH e limite por transação de 0.5 ETH:
+npx hardhat run scripts/createMultiSigAccount.js --network localhost -- 2 1 0.5 0xOwner1,0xOwner2,0xOwner3
+```
+
+### 3. Gerenciar transações MultiSig
+
+#### Propor uma transação:
+```bash
+npx hardhat run scripts/manageMultiSigTransactions.js --network localhost -- propose 0xMultiSigAddress 0xDestinoAddress 0.1
+```
+
+#### Confirmar uma transação:
+```bash
+npx hardhat run scripts/manageMultiSigTransactions.js --network localhost -- confirm 0xMultiSigAddress 0
+```
+
+#### Executar uma transação:
+```bash
+npx hardhat run scripts/manageMultiSigTransactions.js --network localhost -- execute 0xMultiSigAddress 0
+```
+
+#### Listar todas as transações:
+```bash
+npx hardhat run scripts/manageMultiSigTransactions.js --network localhost -- list 0xMultiSigAddress
+```
+
+#### Ver detalhes de uma transação:
+```bash
+npx hardhat run scripts/manageMultiSigTransactions.js --network localhost -- details 0xMultiSigAddress 0
+```
+
+Você também pode usar os scripts NPM para simplificar:
+```bash
+npm run deploy-multisig-factory
+npm run create-multisig -- 2 1 0.5 0xOwner1,0xOwner2,0xOwner3
+npm run multisig-tx -- propose 0xMultiSigAddress 0xDestinoAddress 0.1
+```
+
+### Como funciona
+
+O sistema MultiSig implementa:
+
+1. **Propriedade compartilhada**: múltiplos donos com controle sobre a conta
+2. **Aprovação por quórum**: número mínimo de assinaturas para aprovar transações
+3. **Limites de valores**: limites por transação e diários
+4. **Expiração de propostas**: transações que não são executadas em tempo hábil expiram
+5. **Gerenciamento de permissões**: adicionar/remover donos via aprovação MultiSig
+
+Ideal para:
+- Tesourarias corporativas
+- Gestão de fundos de DAOs
+- Contas compartilhadas entre equipes
+- Segurança adicional para fundos significativos
+
+## Pagamentos Recorrentes e Assinaturas
+
+Esta funcionalidade já está implementada no projeto. Veja como usar:
+
+### 1. Implantar a RecurringPaymentAccountFactory
+
+```bash
+npx hardhat run scripts/deployRecurringPaymentFactory.js --network localhost
+```
+
+### 2. Criar uma conta de pagamentos recorrentes
+
+```bash
+npx hardhat run scripts/createRecurringPaymentAccount.js --network localhost
+```
+
+### 3. Gerenciar assinaturas e pagamentos recorrentes
+
+#### Criar uma nova assinatura:
+```bash
+# Formato: npx hardhat run scripts/manageRecurringPayments.js -- create <account-address> <payee> <amount-in-eth> <period-in-seconds> [start-timestamp] [end-timestamp] [data]
+# Exemplo para pagamento mensal de 0.1 ETH:
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- create 0xSuaContaAddress 0xDestino 0.1 2592000
+```
+
+#### Listar assinaturas ativas:
+```bash
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- list 0xSuaContaAddress
+```
+
+#### Ver detalhes de uma assinatura:
+```bash
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- details 0xSuaContaAddress 0
+```
+
+#### Modificar uma assinatura:
+```bash
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- modify 0xSuaContaAddress 0 0.2 2592000 0
+```
+
+#### Cancelar uma assinatura:
+```bash
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- cancel 0xSuaContaAddress 0
+```
+
+#### Executar uma assinatura específica:
+```bash
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- execute 0xSuaContaAddress 0
+```
+
+#### Executar todas as assinaturas devidas:
+```bash
+npx hardhat run scripts/manageRecurringPayments.js --network localhost -- execute-all 0xSuaContaAddress
+```
+
+Você também pode usar os scripts NPM para simplificar:
+```bash
+npm run deploy-recurring-factory
+npm run create-recurring-account
+npm run manage-subscriptions -- create 0xSuaContaAddress 0xDestino 0.1 2592000
+```
+
+### Como funciona
+
+O sistema de pagamentos recorrentes implementa:
+
+1. **Assinaturas automáticas**: pagamentos periódicos sem intervenção manual
+2. **Configuração flexível**: defina o valor, periodicidade, início e término
+3. **Gestão simplificada**: crie, modifique, cancele e execute assinaturas
+4. **Controle temporal**: pagamentos ocorrem apenas quando devidos
+5. **Suporte a dados personalizados**: envie dados adicionais com cada pagamento
+
+Ideal para:
+- Assinaturas de serviços (como streaming e SaaS)
+- Salários e pagamentos recorrentes
+- Contribuições periódicas para DAOs ou projetos
+- Planos de financiamento com parcelas automáticas
+
+### Automação de Pagamentos
+
+Para automatizar completamente a execução de pagamentos recorrentes, você poderia:
+
+1. Configurar um serviço cron (agendador) para executar regularmente:
+```bash
+# Execute diariamente para processar pagamentos devidos:
+0 0 * * * cd /caminho/projeto && npm run manage-subscriptions -- execute-all 0xSuaContaAddress
+```
+
+2. Integrar com um serviço de oráculos como Chainlink Automation (anteriormente Keeper) para executar transações on-chain quando necessário.
 
 ## Parte 1: Configuração do Projeto
 
@@ -616,5 +816,37 @@ async function sendTransaction() {
             toAddress,
             ethers.utils.parseEther(amount),
             "0x"
-
-```
+        );
+        */
+        
+        // Método 2: Usando o SponsorPaymaster
+        const tx = await entryPointContract.handleOps(
+            [
+                {
+                    sender: smartWalletAddress,
+                    nonce: 0,
+                    initCode: "0x",
+                    callData: ethers.utils.defaultAbiCoder.encode(
+                        ["address", "uint256", "bytes"],
+                        [toAddress, ethers.utils.parseEther(amount), "0x"]
+                    ),
+                    callGasLimit: 0,
+                    verificationGasLimit: 0,
+                    preVerificationGas: 0,
+                    maxFeePerGas: 0,
+                    maxPriorityFeePerGas: 0,
+                    paymasterAndData: "0x",
+                    signature: "0x"
+                }
+            ],
+            address(this)
+        );
+        
+        document.getElementById('txStatusText').textContent = "Transação enviada com sucesso!";
+        document.getElementById('txHash').textContent = tx.hash;
+        
+    } catch (error) {
+        console.error("Erro ao enviar transação:", error);
+        alert("Falha ao enviar transação: " + error.message);
+    }
+}

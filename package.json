@@ -1,0 +1,46 @@
+{
+  "name": "erc4337-social-recovery",
+  "version": "1.0.0",
+  "description": "Implementação de carteiras inteligentes com recuperação social usando ERC-4337",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "deploy": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "create-account": "hardhat run scripts/createAccount.js --network localhost",
+    "manage-guardians": "hardhat run scripts/manageGuardians.js --network localhost",
+    "recover-account": "hardhat run scripts/recoverAccount.js --network localhost",
+    "deploy-paymaster": "hardhat run scripts/deploySponsorPaymaster.js --network localhost",
+    "sponsor-address": "hardhat run scripts/sponsorAccount.js --network localhost -- address",
+    "sponsor-app": "hardhat run scripts/sponsorAccount.js --network localhost -- app",
+    "gasless-tx": "hardhat run scripts/sendGaslessTransaction.js --network localhost",
+    "deploy-multisig-factory": "hardhat run scripts/deployMultiSigFactory.js --network localhost",
+    "create-multisig": "hardhat run scripts/createMultiSigAccount.js --network localhost",
+    "multisig-tx": "hardhat run scripts/manageMultiSigTransactions.js --network localhost",
+    "deploy-recurring-factory": "hardhat run scripts/deployRecurringPaymentFactory.js --network localhost",
+    "create-recurring-account": "hardhat run scripts/createRecurringPaymentAccount.js --network localhost",
+    "manage-subscriptions": "hardhat run scripts/manageRecurringPayments.js --network localhost"
+  },
+  "keywords": [
+    "ethereum",
+    "erc4337",
+    "account-abstraction",
+    "social-recovery",
+    "smart-wallet"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "hardhat": "^2.12.0"
+  },
+  "dependencies": {
+    "@account-abstraction/contracts": "^0.6.0",
+    "@account-abstraction/sdk": "^0.6.0",
+    "@openzeppelin/contracts": "^4.8.0",
+    "dotenv": "^16.0.3",
+    "ethers": "^5.7.2"
+  }
+} 
