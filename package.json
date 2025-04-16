@@ -6,6 +6,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "test:corporate": "hardhat test test/CorporateRecovery*.test.js --network hardhat",
+    "test:bdd": "cucumber-js",
     "node": "hardhat node",
     "deploy": "hardhat run scripts/deploy.js --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
@@ -25,7 +27,8 @@
     "deploy-biometric-factory": "npx hardhat run scripts/deployBiometricAuthFactory.js --network localhost",
     "create-biometric-account": "npx hardhat run scripts/createBiometricAccount.js --network localhost",
     "manage-biometric-devices": "npx hardhat run scripts/manageBiometricDevices.js --network localhost",
-    "deploy-corporate-recovery": "npx hardhat run scripts/deploy-corporate-recovery.js --network localhost"
+    "deploy-corporate-recovery": "npx hardhat run scripts/deploy-corporate-recovery.js --network localhost",
+    "biometric-payments": "npx hardhat run scripts/biometric-daily-payments.js --network localhost"
   },
   "keywords": [
     "ethereum",
@@ -37,7 +40,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@cucumber/cucumber": "^9.1.2",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "chai": "^4.3.7",
     "hardhat": "^2.12.0"
   },
   "dependencies": {
