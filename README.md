@@ -42,17 +42,20 @@ O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios
 - Automatize transações periódicas (ex: assinaturas de serviços) sem intervenção manual, usando lógica programável em contratos inteligentes[4][5].
 - Exemplo: Plataformas de streaming descentralizadas com cobrança mensal automática[1].
 
-- [ ] 5. **Experiência Simplificada para Novos Usuários**
+- [x] 5. **Experiência Simplificada para Novos Usuários**
 - Criação de contas com autenticação biométrica (digital/facial) em smartphones, substituindo frases-semente complexas[1][5].
 - Impacto: Redução de barreiras para adoção em massa, especialmente para usuários não técnicos[1][4].
 
-- [ ] 6. **Interações em Lote (Batch Transactions)**
-- Execute múltiplas ações em uma única transação (ex: comprar NFT e aprovar token em um passo), reduzindo custos e complexidade[2][4].
-- Uso prático: Mercados descentralizados que combinam transferência e listagem de ativos[1].
-
-- [ ] 7. **Gestão Avançada de Ativos em Jogos e Metaverso**
-- Contratos inteligentes gerenciam portfólios de usuários, permitindo transações automáticas de itens dentro de jogos ou mundos virtuais[1][3].
-- Exemplo: Venda de terrenos virtuais (representados por NFTs) com pagamento parcelado via smart contracts[3][5].
+- [ ] 6. **Casos de uso BDD**
+    - [ ] 6.1 Auth (2FA / Biometria)
+    - [ ] 6.2 Transações 
+         - [ ] 6.2.1 Gasless - When to use? ex: NFTs minting, Game items / Proccess : SponsorPaymaster
+         - [ ] 6.2.2 MultiSig - When to use? ex: DAO, DePIN / Proccess : MultiSigAccountFactory
+         - [ ] 6.2.3 Recurring Payments - When to use? ex: SaaS, DePIN / Proccess : RecurringPaymentAccountFactory
+         - [ ] 6.2.4 Batch Transactions - When to use? ex: Game items, NFTs / Proccess : BatchTransactionsAccountFactory
+         - [ ] 6.2.5 Game Assets - When to use? ex: Game items, NFTs / Proccess : GameAssetAccountFactory
+         - [ ] 6.2.6 DePIN - When to use? ex: DePIN, Game items, NFTs / Proccess : DePINAccountFactory
+         
 
 ### Benefícios Gerais para Adoção em Massa
 - **Segurança reforçada:** Menos riscos de perda de chaves e fraudes[4][5].
@@ -259,6 +262,77 @@ Para automatizar completamente a execução de pagamentos recorrentes, você pod
 ```
 
 2. Integrar com um serviço de oráculos como Chainlink Automation (anteriormente Keeper) para executar transações on-chain quando necessário.
+
+## Experiência Simplificada para Novos Usuários (Autenticação Biométrica)
+
+Esta funcionalidade já está implementada no projeto. Veja como usar:
+
+### 1. Implantar a BiometricAuthAccountFactory
+
+```bash
+npx hardhat run scripts/deployBiometricAuthFactory.js --network localhost
+# Ou usando o alias NPM:
+npm run deploy-biometric-factory
+```
+
+### 2. Criar uma conta com autenticação biométrica
+
+```bash
+# Formato básico:
+npx hardhat run scripts/createBiometricAccount.js --network localhost
+
+# Formato com dispositivos personalizados e mínimo necessário:
+# npx hardhat run scripts/createBiometricAccount.js --network localhost device1,device2,device3 2
+# Onde os dispositivos são endereços Ethereum e o número é o mínimo necessário
+
+# Ou usando o alias NPM:
+npm run create-biometric-account
+```
+
+### 3. Gerenciar dispositivos biométricos
+
+```bash
+# Listar informações da conta:
+npx hardhat run scripts/manageBiometricDevices.js --network localhost -- list ENDEREÇO_DA_CONTA
+
+# Adicionar um novo dispositivo:
+npx hardhat run scripts/manageBiometricDevices.js --network localhost -- add ENDEREÇO_DA_CONTA ENDEREÇO_DO_DISPOSITIVO
+
+# Remover um dispositivo:
+npx hardhat run scripts/manageBiometricDevices.js --network localhost -- remove ENDEREÇO_DA_CONTA ENDEREÇO_DO_DISPOSITIVO
+
+# Definir o número mínimo de dispositivos:
+npx hardhat run scripts/manageBiometricDevices.js --network localhost -- set-min ENDEREÇO_DA_CONTA NÚMERO_MÍNIMO
+
+# Ou usando o alias NPM:
+npm run manage-biometric-devices -- list ENDEREÇO_DA_CONTA
+```
+
+### Frontend de Autenticação Biométrica
+
+O projeto inclui uma interface de usuário para interagir com contas biométricas. Para usá-la:
+
+1. Copie os arquivos do diretório `frontend/` para um servidor web
+2. Abra o arquivo `biometricUI.html` em um dispositivo móvel com suporte a biometria
+3. Conecte sua carteira e crie uma conta biométrica
+4. Use sua biometria (impressão digital/face) para autorizar transações
+
+### Como funciona
+
+O sistema de autenticação biométrica implementa:
+
+1. **Verificação de compatibilidade do dispositivo**: detecta se o dispositivo suporta biometria
+2. **Autenticação sem senha**: usa a biometria nativa do dispositivo em vez de senhas ou frases-semente
+3. **Múltiplos dispositivos**: permita adicionar diversos dispositivos biométricos à mesma conta
+4. **Redundância e segurança**: defina um número mínimo de dispositivos necessários para transações
+
+Este modelo é particularmente útil para:
+- Simplificar a experiência de novos usuários
+- Eliminar a necessidade de guardar frases-semente
+- Aumentar a segurança ao vincular a identidade física ao acesso à carteira
+- Reduzir barreiras de adoção para público não técnico
+
+**Nota:** A implementação atual simula a API Web Authentication em navegadores. Em um ambiente de produção, recomenda-se utilizar a API WebAuthn para interagir com os sensores biométricos reais do dispositivo.
 
 ## Parte 1: Configuração do Projeto
 

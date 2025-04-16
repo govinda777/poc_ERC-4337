@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERC-4337 - Autenticação Biométrica</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .biometric-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .fingerprint-icon {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .fingerprint-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .fingerprint-icon svg {
+            width: 60px;
+            height: 60px;
+            fill: white;
+        }
+        
+        .device-list {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bio-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .bio-btn:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .bio-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-badge.supported {
+            background-color: #e6f7e6;
+            color: #2e7d32;
+        }
+        
+        .status-badge.not-supported {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ERC-4337 com Autenticação Biométrica</h1>
+        
+        <!-- Detecção de biometria -->
+        <div class="card">
+            <h2>Detecção de Biometria</h2>
+            <p>Verificando se seu dispositivo suporta autenticação biométrica...</p>
+            
+            <div id="biometricStatus" class="status-badge">Verificando...</div>
+            
+            <div id="bioNotSupported" class="hidden">
+                <p>Seu dispositivo não suporta autenticação biométrica ou o navegador não tem as APIs necessárias.</p>
+                <p>Para uma experiência completa, tente usar um dispositivo móvel com suporte a biometria.</p>
+            </div>
+            
+            <div id="bioSupported" class="hidden">
+                <p>Seu dispositivo suporta autenticação biométrica!</p>
+                <p>Você pode criar uma conta com acesso biométrico e gerenciar seus ativos com a segurança da sua impressão digital ou reconhecimento facial.</p>
+            </div>
+        </div>
+        
+        <!-- Conectar Wallet -->
+        <div class="card">
+            <h2>Conectar Wallet</h2>
+            <button id="connectWallet" class="bio-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 4h-2V3a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-3 0H8V3h8v1zm4 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5h4a1 1 0 0 0 1-1 2 2 0 0 1 2-2h2a2 2 0 0 1 2 2 1 1 0 0 0 1 1h4v5zm0-7h-4a4 4 0 0 0-4-4h-2a4 4 0 0 0-4 4H4V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v5z"/></svg>
+                Conectar Wallet
+            </button>
+            
+            <div id="walletInfo" class="hidden">
+                <p>Endereço: <span id="walletAddress">-</span></p>
+                <p>Saldo: <span id="walletBalance">-</span> ETH</p>
+            </div>
+        </div>
+        
+        <!-- Criar Conta Biométrica -->
+        <div class="card" id="createAccountCard">
+            <h2>Criar Conta com Biometria</h2>
+            <div class="biometric-section">
+                <div class="fingerprint-icon" id="createAccountIcon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.63 0-12 5.37-12 12s5.37 12 12 12 12-5.37 12-12-5.37-12-12-12zm0 22c-5.52 0-10-4.48-10-10s4.48-10 10-10 10 4.48 10 10-4.48 10-10 10zm1-13c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm-6 9c0-2.76 2.24-5 5-5s5 2.24 5 5h2c0-3.86-3.14-7-7-7s-7 3.14-7 7h2zm0-5c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm11 0c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z"/>
+                    </svg>
+                </div>
+                <p>Toque no ícone acima para criar uma conta de smart wallet com autenticação biométrica</p>
+                <button id="createBiometricAccountBtn" class="bio-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.5 2c-3.13 0-5.7 2.14-6.39 5h-3.11l2 2 2-2h-0.95c0.64-1.73 2.28-3 4.45-3 2.5 0 4.5 2 4.5 4.5 0 2.21-1.58 4-3.86 4.41-0.28 0.05-0.5 0.27-0.5 0.55v0.5c0 0.33 0.26 0.58 0.59 0.56 3.12-0.22 5.61-2.68 5.61-5.83 0-3.3-2.7-6-6-6zm-1 5c0 0.55 0.45 1 1 1s1-0.45 1-1-0.45-1-1-1-1 0.45-1 1zm0 5.28v0.72c0 0.55 0.45 1 1 1s1-0.45 1-1v-0.66c-0.66-0.25-1.22-0.67-1.66-1.22-0.15 0.33-0.27 0.71-0.34 1.16z"/></svg>
+                    Criar com Biometria
+                </button>
+            </div>
+            
+            <div id="creatingAccount" class="hidden">
+                <p>Criando sua conta biométrica...</p>
+            </div>
+            
+            <div id="accountCreated" class="hidden">
+                <p>Conta criada com sucesso!</p>
+                <p>Endereço da Smart Wallet: <span id="smartWalletAddress">-</span></p>
+                <button id="fundAccountBtn" class="bio-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                    Depositar 0.01 ETH
+                </button>
+            </div>
+        </div>
+        
+        <!-- Gerenciar Dispositivos -->
+        <div class="card hidden" id="manageDevicesCard">
+            <h2>Gerenciar Dispositivos Biométricos</h2>
+            
+            <div id="deviceStats">
+                <p>Dispositivos ativos: <span id="deviceCount">-</span></p>
+                <p>Mínimo necessário: <span id="minDevices">-</span></p>
+            </div>
+            
+            <div class="device-list" id="deviceList">
+                <!-- Dispositivos serão inseridos aqui -->
+            </div>
+            
+            <button id="addDeviceBtn" class="bio-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                Adicionar Novo Dispositivo
+            </button>
+        </div>
+        
+        <!-- Enviar Transação -->
+        <div class="card hidden" id="sendTransactionCard">
+            <h2>Enviar Transação com Biometria</h2>
+            
+            <div class="form-group">
+                <label for="toAddress">Endereço de Destino:</label>
+                <input type="text" id="toAddress" placeholder="0x...">
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">Valor (ETH):</label>
+                <input type="number" id="amount" placeholder="0.01" step="0.001" min="0">
+            </div>
+            
+            <div class="biometric-section">
+                <div class="fingerprint-icon" id="authTransactionIcon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.63 0-12 5.37-12 12s5.37 12 12 12 12-5.37 12-12-5.37-12-12-12zm0 22c-5.52 0-10-4.48-10-10s4.48-10 10-10 10 4.48 10 10-4.48 10-10 10zm1-13c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm-6 9c0-2.76 2.24-5 5-5s5 2.24 5 5h2c0-3.86-3.14-7-7-7s-7 3.14-7 7h2zm0-5c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm11 0c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z"/>
+                    </svg>
+                </div>
+                <p>Toque no ícone de impressão digital para autenticar a transação</p>
+            </div>
+            
+            <button id="sendTransactionBtn" class="bio-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M2 12l3.6 3.6L7 14l-2.4-2 10.2-0.1L4.8 12l2.2 2-1.4 1.5L2 12z m13.3-5.8L19 3l2.3 2.3L19.4 7 14.8 2.4l1.9-1.9 2.3 2.3-5.7 5.7z"/></svg>
+                Enviar com Biometria
+            </button>
+            
+            <div id="transactionStatus" class="hidden">
+                <p>Status: <span id="txStatusText">-</span></p>
+                <p>Hash: <span id="txHash">-</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <script src="biometricAuth.js"></script>
+    <script>
+        // Estado da aplicação
+        let biometricsSupported = false;
+        let connected = false;
+        let smartWalletCreated = false;
+        
+        // Elementos DOM
+        const biometricStatusEl = document.getElementById('biometricStatus');
+        const bioNotSupportedEl = document.getElementById('bioNotSupported');
+        const bioSupportedEl = document.getElementById('bioSupported');
+        const walletInfoEl = document.getElementById('walletInfo');
+        const walletAddressEl = document.getElementById('walletAddress');
+        const walletBalanceEl = document.getElementById('walletBalance');
+        const creatingAccountEl = document.getElementById('creatingAccount');
+        const accountCreatedEl = document.getElementById('accountCreated');
+        const smartWalletAddressEl = document.getElementById('smartWalletAddress');
+        const manageDevicesCardEl = document.getElementById('manageDevicesCard');
+        const sendTransactionCardEl = document.getElementById('sendTransactionCard');
+        const deviceCountEl = document.getElementById('deviceCount');
+        const minDevicesEl = document.getElementById('minDevices');
+        const deviceListEl = document.getElementById('deviceList');
+        const txStatusTextEl = document.getElementById('txStatusText');
+        const txHashEl = document.getElementById('txHash');
+        const transactionStatusEl = document.getElementById('transactionStatus');
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar suporte a biometria
+            try {
+                biometricsSupported = await BiometricAuth.isBiometricsAvailable();
+                
+                if (biometricsSupported) {
+                    biometricStatusEl.textContent = 'Suportado';
+                    biometricStatusEl.classList.add('supported');
+                    bioSupportedEl.classList.remove('hidden');
+                } else {
+                    biometricStatusEl.textContent = 'Não suportado';
+                    biometricStatusEl.classList.add('not-supported');
+                    bioNotSupportedEl.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Erro ao verificar biometria:", error);
+                biometricStatusEl.textContent = 'Erro na verificação';
+                biometricStatusEl.classList.add('not-supported');
+                bioNotSupportedEl.classList.remove('hidden');
+            }
+            
+            // Listeners de eventos
+            document.getElementById('connectWallet').addEventListener('click', connectWallet);
+            document.getElementById('createBiometricAccountBtn').addEventListener('click', createBiometricAccount);
+            document.getElementById('createAccountIcon').addEventListener('click', createBiometricAccount);
+            document.getElementById('fundAccountBtn').addEventListener('click', fundAccount);
+            document.getElementById('addDeviceBtn').addEventListener('click', addDevice);
+            document.getElementById('sendTransactionBtn').addEventListener('click', sendTransaction);
+            document.getElementById('authTransactionIcon').addEventListener('click', sendTransaction);
+        });
+        
+        // Conectar carteira
+        async function connectWallet() {
+            try {
+                // Inicializa o módulo
+                await BiometricAuth.init({
+                    biometricFactoryAddress: 'FACTORY_ADDRESS_PLACEHOLDER', // Substituir pelo endereço real
+                    entryPointAddress: 'ENTRYPOINT_ADDRESS_PLACEHOLDER' // Substituir pelo endereço real
+                });
+                
+                // Solicita acesso à carteira
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const address = await signer.getAddress();
+                
+                // Atualiza a interface
+                walletAddressEl.textContent = address;
+                
+                const balance = await provider.getBalance(address);
+                walletBalanceEl.textContent = ethers.utils.formatEther(balance);
+                
+                walletInfoEl.classList.remove('hidden');
+                connected = true;
+                
+                console.log("Carteira conectada:", address);
+            } catch (error) {
+                console.error("Erro ao conectar carteira:", error);
+                alert("Falha ao conectar à carteira: " + error.message);
+            }
+        }
+        
+        // Criar conta biométrica
+        async function createBiometricAccount() {
+            if (!connected) {
+                alert("Conecte sua carteira primeiro!");
+                return;
+            }
+            
+            if (!biometricsSupported) {
+                alert("Seu dispositivo não suporta autenticação biométrica!");
+                return;
+            }
+            
+            try {
+                creatingAccountEl.classList.remove('hidden');
+                
+                // Cria a conta biométrica
+                const result = await BiometricAuth.createBiometricAccount();
+                
+                // Atualiza a interface
+                smartWalletAddressEl.textContent = result.accountAddress;
+                accountCreatedEl.classList.remove('hidden');
+                creatingAccountEl.classList.add('hidden');
+                manageDevicesCardEl.classList.remove('hidden');
+                sendTransactionCardEl.classList.remove('hidden');
+                
+                // Atualiza os dispositivos
+                updateDeviceInfo();
+                
+                smartWalletCreated = true;
+                
+                console.log("Conta biométrica criada:", result.accountAddress);
+            } catch (error) {
+                console.error("Erro ao criar conta biométrica:", error);
+                alert("Falha ao criar conta biométrica: " + error.message);
+                creatingAccountEl.classList.add('hidden');
+            }
+        }
+        
+        // Depositar fundos na conta
+        async function fundAccount() {
+            if (!smartWalletCreated) {
+                alert("Crie uma conta biométrica primeiro!");
+                return;
+            }
+            
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                
+                txStatusTextEl.textContent = "Enviando ETH...";
+                transactionStatusEl.classList.remove('hidden');
+                
+                // Envia ETH para a conta
+                const tx = await signer.sendTransaction({
+                    to: smartWalletAddressEl.textContent,
+                    value: ethers.utils.parseEther("0.01")
+                });
+                
+                txHashEl.textContent = tx.hash;
+                
+                await tx.wait();
+                
+                txStatusTextEl.textContent = "Fundos enviados com sucesso!";
+                
+                console.log("Conta financiada:", tx.hash);
+            } catch (error) {
+                console.error("Erro ao financiar conta:", error);
+                txStatusTextEl.textContent = "Erro: " + error.message;
+            }
+        }
+        
+        // Adicionar novo dispositivo
+        async function addDevice() {
+            if (!smartWalletCreated) {
+                alert("Crie uma conta biométrica primeiro!");
+                return;
+            }
+            
+            try {
+                // Adiciona o dispositivo
+                const deviceKey = await BiometricAuth.addNewDevice();
+                
+                // Atualiza a interface
+                updateDeviceInfo();
+                
+                alert("Novo dispositivo adicionado com sucesso!");
+                console.log("Novo dispositivo:", deviceKey);
+            } catch (error) {
+                console.error("Erro ao adicionar dispositivo:", error);
+                alert("Falha ao adicionar dispositivo: " + error.message);
+            }
+        }
+        
+        // Atualiza informações de dispositivos
+        async function updateDeviceInfo() {
+            if (!BiometricAuth.account) return;
+            
+            try {
+                const deviceCount = await BiometricAuth.account.deviceCount();
+                const minDevices = await BiometricAuth.account.minDevices();
+                
+                deviceCountEl.textContent = deviceCount.toString();
+                minDevicesEl.textContent = minDevices.toString();
+                
+                // Não podemos listar os dispositivos diretamente por limitação da blockchain
+                // Em uma implementação real, seria necessário um banco de dados off-chain
+            } catch (error) {
+                console.error("Erro ao atualizar informações de dispositivos:", error);
+            }
+        }
+        
+        // Enviar transação
+        async function sendTransaction() {
+            if (!smartWalletCreated) {
+                alert("Crie uma conta biométrica primeiro!");
+                return;
+            }
+            
+            const toAddress = document.getElementById('toAddress').value;
+            const amount = document.getElementById('amount').value;
+            
+            if (!ethers.utils.isAddress(toAddress)) {
+                alert("Endereço de destino inválido!");
+                return;
+            }
+            
+            if (parseFloat(amount) <= 0) {
+                alert("Valor deve ser maior que zero!");
+                return;
+            }
+            
+            try {
+                txStatusTextEl.textContent = "Autenticando...";
+                transactionStatusEl.classList.remove('hidden');
+                
+                // Executa a transação
+                const tx = await BiometricAuth.executeTransaction(
+                    toAddress,
+                    ethers.utils.parseEther(amount),
+                    "0x"
+                );
+                
+                txHashEl.textContent = tx.hash;
+                txStatusTextEl.textContent = "Transação enviada!";
+                
+                await tx.wait();
+                
+                txStatusTextEl.textContent = "Transação confirmada!";
+                
+                console.log("Transação enviada:", tx.hash);
+            } catch (error) {
+                console.error("Erro ao enviar transação:", error);
+                txStatusTextEl.textContent = "Erro: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html> 

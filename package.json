@@ -21,7 +21,11 @@
     "multisig-tx": "hardhat run scripts/manageMultiSigTransactions.js --network localhost",
     "deploy-recurring-factory": "hardhat run scripts/deployRecurringPaymentFactory.js --network localhost",
     "create-recurring-account": "hardhat run scripts/createRecurringPaymentAccount.js --network localhost",
-    "manage-subscriptions": "hardhat run scripts/manageRecurringPayments.js --network localhost"
+    "manage-subscriptions": "hardhat run scripts/manageRecurringPayments.js --network localhost",
+    "deploy-biometric-factory": "npx hardhat run scripts/deployBiometricAuthFactory.js --network localhost",
+    "create-biometric-account": "npx hardhat run scripts/createBiometricAccount.js --network localhost",
+    "manage-biometric-devices": "npx hardhat run scripts/manageBiometricDevices.js --network localhost",
+    "deploy-corporate-recovery": "npx hardhat run scripts/deploy-corporate-recovery.js --network localhost"
   },
   "keywords": [
     "ethereum",
