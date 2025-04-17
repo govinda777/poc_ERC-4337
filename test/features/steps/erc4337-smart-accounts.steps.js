@@ -702,7 +702,24 @@ Then('eu não devo pagar pelos custos de gas', async function() {
   const receipt = await smartAccounts.lastTx.wait();
   const userOpEvent = receipt.events?.find(e => e.event === 'UserOperationEvent');
   expect(userOpEvent, "UserOperationEvent not found").to.exist;
-  expect(userOpEvent.args.actualGasCost).to.equal(0); // Sender pays nothing
+  
+  console.log("UserOperationEvent args:", {
+    userOpHash: userOpEvent.args.userOpHash,
+    sender: userOpEvent.args.sender,
+    paymaster: userOpEvent.args.paymaster,
+    nonce: userOpEvent.args.nonce.toString(),
+    success: userOpEvent.args.success,
+    actualGasCost: userOpEvent.args.actualGasCost.toString(),
+    actualGasUsed: userOpEvent.args.actualGasUsed.toString()
+  });
+  
+  // Check that the paymaster address in the event matches our paymaster
+  expect(userOpEvent.args.paymaster.toLowerCase()).to.equal(contracts.paymaster.address.toLowerCase(), 
+    "Paymaster in event doesn't match our SponsorPaymaster");
+  
+  // The test expects actualGasCost to be 0, which means the sender doesn't pay for gas
+  // If this is failing, it means our paymaster isn't properly configured to cover costs
+  expect(userOpEvent.args.actualGasCost).to.equal(0, "Sender should not pay for gas");
 });
 
 Then('o Paymaster deve cobrir os custos de gas', async function() {
