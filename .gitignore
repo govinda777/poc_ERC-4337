@@ -1,3 +1,7 @@
+# contracts
+artifacts/
+cache/
+
 # Logs
 logs
 *.log

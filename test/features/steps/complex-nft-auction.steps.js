@@ -44,14 +44,19 @@ Given('the complex NFT auction contract is deployed', async function() {
 
 Given('the auction account contract is deployed', async function() {
   // First deploy EntryPoint contract which is required for ERC-4337
-  const EntryPoint = await ethers.getContractFactory('EntryPoint');
-  contracts.entryPoint = await EntryPoint.deploy();
-  await contracts.entryPoint.deployed();
-  
-  // Then deploy the AuctionAccountFactory
-  const AuctionAccountFactory = await ethers.getContractFactory('AuctionAccountFactory');
-  contracts.accountFactory = await AuctionAccountFactory.deploy(contracts.entryPoint.address);
-  await contracts.accountFactory.deployed();
+  try {
+    const EntryPoint = await ethers.getContractFactory('contracts/mocks/EntryPoint.sol:EntryPoint');
+    contracts.entryPoint = await EntryPoint.deploy();
+    await contracts.entryPoint.deployed();
+    
+    // Then deploy the AuctionAccountFactory
+    const AuctionAccountFactory = await ethers.getContractFactory('AuctionAccountFactory');
+    contracts.accountFactory = await AuctionAccountFactory.deploy(contracts.entryPoint.address);
+    await contracts.accountFactory.deployed();
+  } catch (error) {
+    console.error("Error deploying EntryPoint or AuctionAccountFactory:", error.message);
+    throw error;
+  }
 });
 
 Given('users have been minted tokens and NFTs', async function() {

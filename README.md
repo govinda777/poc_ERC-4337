@@ -73,7 +73,13 @@ ENTRY_POINT_ADDRESS=0x0000000000000000000000000000000000000000
 
 O endereço do EntryPoint será substituído automaticamente após o deployment.
 
-### 4. Iniciar a Aplicação
+### 4. Executar testes BDD
+
+```bash
+npm run test:bdd-erc4337
+```
+
+### 5. Iniciar a Aplicação
 
 Existem várias maneiras de iniciar a aplicação, dependendo do seu caso de uso:
 
