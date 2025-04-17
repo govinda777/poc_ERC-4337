@@ -21,8 +21,8 @@ const Login = () => (
 
 const NotFound = () => (
   <div className="container mt-5 text-center">
-    <h1>404 - Página Não Encontrada</h1>
-    <p>A página que você procura não existe.</p>
+    <h1>404 - Página nao Encontrada</h1>
+    <p>A página que você procura nao existe.</p>
   </div>
 );
 

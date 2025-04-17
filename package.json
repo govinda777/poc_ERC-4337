@@ -28,7 +28,23 @@
     "create-biometric-account": "npx hardhat run scripts/createBiometricAccount.js --network localhost",
     "manage-biometric-devices": "npx hardhat run scripts/manageBiometricDevices.js --network localhost",
     "deploy-corporate-recovery": "npx hardhat run scripts/deploy-corporate-recovery.js --network localhost",
-    "biometric-payments": "npx hardhat run scripts/biometric-daily-payments.js --network localhost"
+    "biometric-payments": "npx hardhat run scripts/biometric-daily-payments.js --network localhost",
+    
+    "preinstall": "npm install -g concurrently wait-on",
+    "clean": "npx hardhat clean",
+    "setup": "npm run compile",
+    
+    "start-node": "hardhat node",
+    "setup-contracts": "wait-on tcp:8545 && npm run deploy && npm run deploy-paymaster && npm run sponsor-address",
+    "setup-accounts": "wait-on tcp:8545 && npm run create-account && npm run deploy-biometric-factory && npm run create-biometric-account",
+    
+    "start": "concurrently -n \"node,contracts\" -c \"blue,green\" \"npm run start-node\" \"npm run setup-contracts\"",
+    "start:full": "concurrently -n \"node,contracts,accounts\" -c \"blue,green,yellow\" \"npm run start-node\" \"npm run setup-contracts\" \"npm run setup-accounts\"",
+    
+    "start:app": "./scripts/start.sh",
+    "stop:app": "./scripts/stop.sh",
+    
+    "start:complete": "mkdir -p logs && npm run clean && npm run compile && npm run start:app"
   },
   "keywords": [
     "ethereum",
@@ -43,7 +59,9 @@
     "@cucumber/cucumber": "^9.1.2",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "chai": "^4.3.7",
-    "hardhat": "^2.12.0"
+    "concurrently": "^8.2.2",
+    "hardhat": "^2.12.0",
+    "wait-on": "^7.2.0"
   },
   "dependencies": {
     "@account-abstraction/contracts": "^0.6.0",

@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * GamePaymaster: a paymaster for the "CryptoQuest" Play-to-Earn game
  * Allows new players to make transactions without ETH, using game NFTs as collateral
  */
-contract GamePaymaster is BasePaymaster, Ownable {
+contract GamePaymaster is BasePaymaster {
     // Game token (USDC) for paying gas
     IERC20 public immutable gameToken;
     address public immutable gameTokenAddress;
@@ -38,7 +38,7 @@ contract GamePaymaster is BasePaymaster, Ownable {
         IEntryPoint _entryPoint,
         address _gameTokenAddress,
         address _gameContract
-    ) BasePaymaster(_entryPoint) Ownable(msg.sender) {
+    ) BasePaymaster(_entryPoint) {
         gameTokenAddress = _gameTokenAddress;
         gameToken = IERC20(_gameTokenAddress);
         gameContract = _gameContract;

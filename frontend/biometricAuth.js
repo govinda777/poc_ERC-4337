@@ -1,8 +1,8 @@
 /**
- * Módulo de Autenticação Biométrica para ERC-4337
+ * Módulo de Autenticacao Biométrica para ERC-4337
  * 
  * Este módulo fornece funções para interagir com contas do tipo BiometricAuthAccount,
- * implementando a interface necessária para autenticação biométrica em dispositivos móveis.
+ * implementando a interface necessária para Autenticacao biométrica em dispositivos móveis.
  */
 
 // Endereços dos contratos implantados (serão carregados dinamicamente)
@@ -35,14 +35,14 @@ const BiometricAuth = {
   accountAddress: null,
   
   /**
-   * Inicializa o módulo de autenticação biométrica
+   * Inicializa o módulo de Autenticacao biométrica
    * @param {Object} config Configuração de endereços
    * @returns {Promise<void>}
    */
   async init(config) {
-    // Verifica se o provider está disponível
+    // Verifica se o provider esta disponível
     if (!window.ethereum) {
-      throw new Error("Provedor Ethereum não encontrado. Por favor, instale o MetaMask.");
+      throw new Error("Provedor Ethereum nao encontrado. Por favor, instale o MetaMask.");
     }
     
     // Configura o provider e signer
@@ -64,20 +64,20 @@ const BiometricAuth = {
   },
   
   /**
-   * Verifica se o dispositivo suporta autenticação biométrica
+   * Verifica se o dispositivo suporta Autenticacao biométrica
    * @returns {Promise<boolean>} Verdadeiro se o dispositivo suportar biometria
    */
   async isBiometricsAvailable() {
     try {
       // Verificar se o navegador suporta a API Web Authentication
       if (!window.PublicKeyCredential) {
-        console.log("Web Authentication API não suportada");
+        console.log("Web Authentication API nao suportada");
         return false;
       }
       
-      // Verificar se o dispositivo suporta autenticação biométrica
+      // Verificar se o dispositivo suporta Autenticacao biométrica
       const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      console.log(`Autenticação biométrica ${available ? '' : 'não '}disponível`);
+      console.log(`Autenticacao biométrica ${available ? '' : 'nao '}disponível`);
       return available;
     } catch (error) {
       console.error("Erro ao verificar disponibilidade biométrica:", error);
@@ -86,18 +86,18 @@ const BiometricAuth = {
   },
   
   /**
-   * Cria uma nova conta com autenticação biométrica
+   * Cria uma nova conta com Autenticacao biométrica
    * @returns {Promise<{accountAddress: string, deviceKey: string}>} Endereço da conta e chave do dispositivo
    */
   async createBiometricAccount() {
     try {
-      // Verifica se biometria está disponível
+      // Verifica se biometria esta disponível
       const biometricsAvailable = await this.isBiometricsAvailable();
       if (!biometricsAvailable) {
-        throw new Error("Autenticação biométrica não disponível neste dispositivo");
+        throw new Error("Autenticacao biométrica nao disponível neste dispositivo");
       }
       
-      // Solicita autenticação biométrica para criar novo par de chaves
+      // Solicita Autenticacao biométrica para criar novo par de chaves
       const deviceKey = await this._createBiometricKey("create-account");
       
       // Obtém a carteira conectada como admin
@@ -159,7 +159,7 @@ const BiometricAuth = {
   },
   
   /**
-   * Executa uma transação usando autenticação biométrica
+   * Executa uma transação usando Autenticacao biométrica
    * @param {string} to Endereço de destino
    * @param {string|ethers.BigNumber} value Valor em wei
    * @param {string} data Dados da chamada
@@ -167,12 +167,12 @@ const BiometricAuth = {
    */
   async executeTransaction(to, value, data) {
     try {
-      // Verifica se a conta está configurada
+      // Verifica se a conta esta configurada
       if (!this.account) {
-        throw new Error("Conta biométrica não configurada");
+        throw new Error("Conta biométrica nao configurada");
       }
       
-      // Solicita autenticação biométrica
+      // Solicita Autenticacao biométrica
       await this._authenticateWithBiometrics("transaction");
       
       // Executa a transação
@@ -190,12 +190,12 @@ const BiometricAuth = {
    */
   async addNewDevice() {
     try {
-      // Verifica se a conta está configurada
+      // Verifica se a conta esta configurada
       if (!this.account) {
-        throw new Error("Conta biométrica não configurada");
+        throw new Error("Conta biométrica nao configurada");
       }
       
-      // Solicita autenticação biométrica para criar novo par de chaves
+      // Solicita Autenticacao biométrica para criar novo par de chaves
       const deviceKey = await this._createBiometricKey("add-device");
       
       // Adiciona o dispositivo à conta
@@ -212,7 +212,7 @@ const BiometricAuth = {
   
   /**
    * Cria um par de chaves associado à biometria
-   * @param {string} action Ação que está sendo realizada
+   * @param {string} action Ação que esta sendo realizada
    * @returns {Promise<string>} Endereço Ethereum derivado
    * @private
    */
@@ -224,7 +224,7 @@ const BiometricAuth = {
       // Cria um novo par de chaves aleatório para simular o processo
       const wallet = ethers.Wallet.createRandom();
       
-      // Simula uma solicitação de autenticação biométrica
+      // Simula uma solicitação de Autenticacao biométrica
       await this._simulateBiometricPrompt(`Autenticar para ${action}`);
       
       // Retorna o endereço derivado da chave pública
@@ -237,7 +237,7 @@ const BiometricAuth = {
   
   /**
    * Autentica o usuário usando biometria
-   * @param {string} action Ação que está sendo autenticada
+   * @param {string} action Ação que esta sendo autenticada
    * @returns {Promise<void>}
    * @private
    */
@@ -246,16 +246,16 @@ const BiometricAuth = {
       // Na implementação real, isso usaria a API Web Authentication
       // para verificar a identidade do usuário com biometria
       
-      // Simula uma solicitação de autenticação biométrica
+      // Simula uma solicitação de Autenticacao biométrica
       await this._simulateBiometricPrompt(`Autenticar para ${action}`);
     } catch (error) {
-      console.error("Erro na autenticação biométrica:", error);
+      console.error("Erro na Autenticacao biométrica:", error);
       throw error;
     }
   },
   
   /**
-   * Simula uma solicitação de autenticação biométrica
+   * Simula uma solicitação de Autenticacao biométrica
    * @param {string} message Mensagem a ser exibida
    * @returns {Promise<void>}
    * @private
@@ -267,11 +267,11 @@ const BiometricAuth = {
       
       // Simula o tempo de processamento da biometria
       setTimeout(() => {
-        const confirmed = window.confirm(`${message}\n\n[Esta é uma simulação de autenticação biométrica]`);
+        const confirmed = window.confirm(`${message}\n\n[Esta é uma simulação de Autenticacao biométrica]`);
         if (confirmed) {
           resolve();
         } else {
-          reject(new Error("Autenticação biométrica cancelada pelo usuário"));
+          reject(new Error("Autenticacao biométrica cancelada pelo usuário"));
         }
       }, 1000);
     });

@@ -66,7 +66,7 @@ class BiometricService {
       localStorage.setItem('bioCredentialId', credentialId);
       localStorage.setItem('bioUsername', username);
       
-      // Armazenar o ID de credencial e outros dados necessários para autenticação
+      // Armazenar o ID de credencial e outros dados necessários para Autenticacao
       const credentialJSON = {
         id: credentialId,
         rawId: Array.from(new Uint8Array(credential.rawId)),
@@ -117,7 +117,7 @@ class BiometricService {
       });
       
       if (!assertion) {
-        throw new Error('Autenticação biométrica falhou');
+        throw new Error('Autenticacao biométrica falhou');
       }
       
       // Verificar a resposta do servidor - em um cenário real,
@@ -128,7 +128,7 @@ class BiometricService {
         assertion
       };
     } catch (error) {
-      console.error('Erro na autenticação biométrica:', error);
+      console.error('Erro na Autenticacao biométrica:', error);
       throw error;
     }
   }

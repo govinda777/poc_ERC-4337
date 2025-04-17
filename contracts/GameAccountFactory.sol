@@ -10,10 +10,10 @@ import "./GamePaymaster.sol";
 
 /**
  * Factory para criar contas de jogador para o jogo "CryptoQuest"
- * Permite a criação de contas via autenticação social (Google/Apple ID)
+ * Permite a criação de contas via Autenticacao social (Google/Apple ID)
  */
 contract GameAccountFactory is Ownable {
-    GameAccount public immutable accountImplementation;
+    address public immutable accountImplementation;
     GamePaymaster public immutable gamePaymaster;
     
     // Mapping to track social auth identifiers
@@ -26,21 +26,23 @@ contract GameAccountFactory is Ownable {
     constructor(
         IEntryPoint _entryPoint,
         GamePaymaster _gamePaymaster
-    ) Ownable(msg.sender) {
-        accountImplementation = new GameAccount(_entryPoint);
+    ) {
+        // Deploy a concrete implementation of GameAccount
+        accountImplementation = address(new GameAccountImpl(_entryPoint));
         gamePaymaster = _gamePaymaster;
+        _transferOwnership(msg.sender);
     }
 
     /**
-     * Cria uma conta para um novo jogador usando autenticação social
-     * @param socialAuthProof prova criptográfica da autenticação social
+     * Cria uma conta para um novo jogador usando Autenticacao social
+     * @param socialAuthProof prova criptográfica da Autenticacao social
      * @param salt valor de salt para geração do endereço
      * @return account o endereço da conta criada
      */
     function createAccountViaSocialAuth(
         bytes calldata socialAuthProof,
         uint256 salt
-    ) public returns (GameAccount account) {
+    ) public returns (GameAccountImpl account) {
         // Verify social auth proof
         // Note: In a real implementation, this would validate signatures
         // from OAuth providers or other auth systems
@@ -53,12 +55,12 @@ contract GameAccountFactory is Ownable {
         address addr = getAddress(socialAuthId, salt);
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
-            return GameAccount(payable(addr));
+            return GameAccountImpl(payable(addr));
         }
         
-        account = GameAccount(payable(
+        account = GameAccountImpl(payable(
             new ERC1967Proxy{salt: bytes32(salt)}(
-                address(accountImplementation),
+                accountImplementation,
                 abi.encodeCall(GameAccount.initialize, (socialAuthId, address(gamePaymaster)))
             )
         ));
@@ -91,7 +93,7 @@ contract GameAccountFactory is Ownable {
 
     /**
      * Calcula o endereço da conta que seria criada
-     * @param socialAuthId identificador da autenticação social
+     * @param socialAuthId identificador da Autenticacao social
      * @param salt valor de salt para geração do endereço
      * @return o endereço da conta
      */

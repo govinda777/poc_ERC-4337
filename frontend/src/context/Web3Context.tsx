@@ -76,7 +76,7 @@ export const Web3ContextProvider = ({ children }: Web3ContextProviderProps) => {
           } else if (network.chainId === 5) { // Goerli
             setEntryPointAddress(ERC4337_CONTRACTS.goerli.entryPoint);
           } else {
-            console.warn("Rede não suportada para ERC-4337");
+            console.warn("Rede nao suportada para ERC-4337");
             setEntryPointAddress(null);
           }
         } catch (error) {
@@ -98,7 +98,7 @@ export const Web3ContextProvider = ({ children }: Web3ContextProviderProps) => {
         const factoryAddress = ERC4337_CONTRACTS[chainId === 11155111 ? 'sepolia' : 'goerli'].deFiInsuranceFactory;
         
         if (!factoryAddress) {
-          console.warn("Factory address não encontrado para esta rede");
+          console.warn("Factory address nao encontrado para esta rede");
           return;
         }
         
@@ -140,7 +140,7 @@ export const Web3ContextProvider = ({ children }: Web3ContextProviderProps) => {
   const createSmartAccount = async (accountType: string, params: any): Promise<string> => {
     if (!signer || !address || !chainId) {
       toast.error("Conecte sua carteira primeiro");
-      throw new Error("Wallet não conectada");
+      throw new Error("Wallet nao conectada");
     }
     
     try {
@@ -204,7 +204,7 @@ export const Web3ContextProvider = ({ children }: Web3ContextProviderProps) => {
           break;
           
         default:
-          throw new Error(`Tipo de conta não suportado: ${accountType}`);
+          throw new Error(`Tipo de conta nao suportado: ${accountType}`);
       }
       
       // Criar a conta

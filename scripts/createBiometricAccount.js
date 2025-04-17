@@ -8,7 +8,7 @@ async function main() {
   const addresses = JSON.parse(fs.readFileSync("addresses.json", "utf8"));
   
   if (!addresses.biometricAuthFactory) {
-    console.error("Factory de contas biométricas não encontrada! Execute deployBiometricAuthFactory.js primeiro.");
+    console.error("Factory de contas biométricas nao encontrada! Execute deployBiometricAuthFactory.js primeiro.");
     process.exit(1);
   }
   
@@ -33,12 +33,12 @@ async function main() {
   if (args.length >= 2) {
     minDevices = parseInt(args[1]);
     if (isNaN(minDevices)) {
-      console.error("O número mínimo de dispositivos deve ser um número válido");
+      console.error("O número minimo de dispositivos deve ser um número válido");
       process.exit(1);
     }
     
     if (minDevices <= 0 || minDevices > devices.length) {
-      console.error(`O número mínimo de dispositivos deve estar entre 1 e ${devices.length}`);
+      console.error(`O número minimo de dispositivos deve estar entre 1 e ${devices.length}`);
       process.exit(1);
     }
   }
@@ -47,7 +47,7 @@ async function main() {
   const salt = Math.floor(Math.random() * 1000000);
   console.log(`Criando conta biométrica para admin ${admin.address} com ${devices.length} dispositivo(s) e salt ${salt}...`);
   console.log("Dispositivos:", devices);
-  console.log("Dispositivos mínimos:", minDevices);
+  console.log("Dispositivos minimos:", minDevices);
   
   // Calcula o endereço da conta antes de criá-la
   const accountAddress = await factory.getAddress(admin.address, devices, minDevices, salt);
@@ -67,7 +67,7 @@ async function main() {
   
   console.log("\nUso da conta:");
   console.log("- Esta conta pode ser acessada pelos dispositivos autorizados");
-  console.log("- A autenticação biométrica é validada off-chain pelo app");
+  console.log("- A Autenticacao biométrica é validada off-chain pelo app");
   console.log("- As transações são assinadas com as chaves privadas dos dispositivos autorizados");
 }
 
@@ -78,7 +78,7 @@ Uso: node createBiometricAccount.js [dispositivos] [minDispositivos]
 
 Argumentos:
   dispositivos      Lista de endereços separados por vírgula (ex: 0x123,0x456)
-  minDispositivos   Número mínimo de dispositivos necessários (padrão: 1)
+  minDispositivos   Número minimo de dispositivos necessários (padrão: 1)
 
 Exemplos:
   node createBiometricAccount.js

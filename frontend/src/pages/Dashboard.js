@@ -83,7 +83,7 @@ const Dashboard = () => {
                   <p><strong>Saldo Smart Wallet:</strong> {smartWalletBalance} ETH</p>
                 </>
               ) : (
-                <p className="text-warning">Você ainda não possui uma carteira inteligente.</p>
+                <p className="text-warning">Você ainda nao possui uma carteira inteligente.</p>
               )}
             </div>
             <div className="card-footer">
@@ -100,13 +100,13 @@ const Dashboard = () => {
         <div className="col-md-6">
           <div className="card h-100">
             <div className="card-header">
-              <h3>Autenticação Biométrica</h3>
+              <h3>Autenticacao Biométrica</h3>
             </div>
             <div className="card-body">
               {!smartWalletAddress && <BiometricAuth />}
               {smartWalletAddress && (
                 <div className="alert alert-success">
-                  <p>Sua carteira biométrica já está configurada.</p>
+                  <p>Sua carteira biométrica já esta configurada.</p>
                   <p>Endereço: {smartWalletAddress}</p>
                 </div>
               )}

@@ -68,7 +68,7 @@ class Web3Service {
   async createSmartWallet(salt = Math.floor(Math.random() * 1000000)) {
     try {
       if (!this.factory) {
-        throw new Error('Factory não inicializada');
+        throw new Error('Factory nao inicializada');
       }
       
       // Calcular endereço da carteira antes de criar
@@ -78,7 +78,7 @@ class Web3Service {
       const code = await this.provider.getCode(this.smartWalletAddress);
       
       if (code === '0x') {
-        // Carteira ainda não existe, vamos criá-la
+        // Carteira ainda nao existe, vamos criá-la
         const tx = await this.factory.createAccount(this.account, salt);
         await tx.wait();
       }
@@ -99,7 +99,7 @@ class Web3Service {
   
   async executeTransaction(target, value, data = '0x') {
     if (!this.smartWallet) {
-      throw new Error('Smart Wallet não inicializada');
+      throw new Error('Smart Wallet nao inicializada');
     }
     
     try {
@@ -119,7 +119,7 @@ class Web3Service {
   
   async executeGaslessTransaction(target, value, paymaster, paymasterData = '0x') {
     if (!this.smartWallet || !this.entryPoint) {
-      throw new Error('Smart Wallet ou EntryPoint não inicializados');
+      throw new Error('Smart Wallet ou EntryPoint nao inicializados');
     }
     
     try {

@@ -1,7 +1,7 @@
-Feature: Autenticação Biométrica
+Feature: Autenticacao Biométrica
   Como usuário da plataforma
   Eu quero criar e acessar minha carteira usando biometria
-  Para que eu não precise gerenciar frases-semente complexas
+  Para que eu nao precise gerenciar frases-semente complexas
 
   Scenario: Verificação de Compatibilidade do Dispositivo
     Given que estou na página de criação de conta
@@ -16,9 +16,9 @@ Feature: Autenticação Biométrica
     Then uma nova carteira deve ser criada
     And devo ser redirecionado para o dashboard
 
-  Scenario: Autenticação com Biometria
+  Scenario: Autenticacao com Biometria
     Given que possuo uma conta biométrica
     When eu tento acessar minha carteira
-    And forneço minha autenticação biométrica
+    And forneço minha Autenticacao biométrica
     Then devo ser autenticado com sucesso
     And visualizar meu saldo e transações 

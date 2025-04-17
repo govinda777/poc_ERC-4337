@@ -19,8 +19,8 @@ contract MultiSigAccountFactory {
     /**
      * Cria uma conta multisig, inicializando-a com múltiplos donos
      * @param owners Lista de endereços dos donos
-     * @param threshold Número mínimo de assinaturas necessárias
-     * @param dailyLimit Limite diário de transações (em wei)
+     * @param threshold Número minimo de assinaturas necessárias
+     * @param dailyLimit Limite diario de transações (em wei)
      * @param txLimit Limite por transação (em wei)
      * @param salt Valor para derivação do endereço
      */

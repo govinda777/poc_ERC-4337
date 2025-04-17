@@ -22,20 +22,222 @@ erc4337-poc/
 └── package.json
 ```
 
+## Configuração Local
+
+Este guia fornece instruções passo a passo para configurar e executar o projeto ERC-4337 em seu ambiente local.
+
+### Requisitos
+
+- Node.js (v14 ou superior)
+- npm (v7 ou superior)
+- Git
+
+### 1. Clonar o Repositório
+
+Se você ainda nao clonou o repositório:
+
+```bash
+git clone https://github.com/seu-usuario/poc_ERC-4337.git
+cd poc_ERC-4337
+```
+
+### 2. Instalar Dependências
+
+Instale todas as dependências do projeto:
+
+```bash
+npm install
+```
+
+### 3. Configurar Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto baseado no `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Abra o arquivo `.env` e configure as seguintes variáveis:
+
+```
+# Chave privada para testes (nao use em produção)
+PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+# URLs de RPC
+LOCALHOST_URL=http://127.0.0.1:8545
+SEPOLIA_URL=https://sepolia.infura.io/v3/seu-id-infura
+
+# Configurações da Aplicação
+ENTRY_POINT_ADDRESS=0x0000000000000000000000000000000000000000
+```
+
+O endereço do EntryPoint será substituído automaticamente após o deployment.
+
+### 4. Iniciar a Aplicação
+
+Existem várias maneiras de iniciar a aplicação, dependendo do seu caso de uso:
+
+#### Opção 1: Iniciar Tudo com Um Comando (Recomendado)
+
+Este método usa um script Shell para iniciar a aplicação completa, incluindo a rede local, deploy de contratos e criação de contas inteligentes:
+
+```bash
+npm run start:complete
+```
+
+Este comando:
+- Limpa artefatos antigos
+- Compila os contratos
+- Inicia o node Hardhat em segundo plano
+- Implanta todos os contratos principais
+- Cria contas smart com recuperação social e biométrica
+- Configura Paymaster para transações sem gas
+
+Quando terminar de usar, pare a aplicação com:
+
+```bash
+npm run stop:app
+```
+
+#### Opção 2: Iniciar com Componentes Paralelos
+
+Use o Concurrently para iniciar múltiplos componentes em paralelo:
+
+```bash
+# Versão básica (node + contratos principais)
+npm run start
+
+# Versão completa (node + contratos + contas)
+npm run start:full
+```
+
+#### Opção 3: Método Passo a Passo (Manual)
+
+Se preferir controlar cada etapa manualmente:
+
+```bash
+# Terminal 1: Iniciar o node
+npm run node
+
+# Terminal 2: Deploy dos contratos (após o node estar rodando)
+npm run deploy
+npm run deploy-paymaster
+npm run create-account
+```
+
+### 5. Criar Diferentes Tipos de Contas
+
+Dependendo do tipo de conta que você quer testar, execute um dos seguintes comandos:
+
+#### Conta com Recuperação Social
+```bash
+npm run create-account
+```
+
+#### Conta MultiSig (precisa da factory)
+```bash
+npm run deploy-multisig-factory
+npm run create-multisig
+```
+
+#### Conta com Pagamentos Recorrentes
+```bash
+npm run deploy-recurring-factory
+npm run create-recurring-account
+```
+
+#### Conta com Autenticacao Biométrica
+```bash
+npm run deploy-biometric-factory
+npm run create-biometric-account
+```
+
+#### Conta com Recuperação Corporativa
+```bash
+npm run deploy-corporate-recovery
+```
+
+### 6. Configurar Paymaster (para transações gasless)
+
+Se quiser testar transações sem gas (gasless):
+
+```bash
+npm run deploy-paymaster
+npm run sponsor-address
+```
+
+### 7. Testar Funcionalidades
+
+#### Executar Testes Automatizados
+
+```bash
+npm run test
+```
+
+#### Testes Específicos
+
+```bash
+npm run test:corporate  # Testes para recuperação corporativa
+npm run test:bdd        # Testes BDD com Cucumber
+```
+
+#### Exemplos de Uso
+
+- Gerenciar guardiões: `npm run manage-guardians`
+- Recuperar conta: `npm run recover-account`
+- Gerenciar transações MultiSig: `npm run multisig-tx`
+- Gerenciar assinaturas recorrentes: `npm run manage-subscriptions`
+- Gerenciar dispositivos biométricos: `npm run manage-biometric-devices`
+- Pagamentos com Autenticacao biométrica: `npm run biometric-payments`
+
+### 8. Execução de Transação sem Gas
+
+Para testar uma transação sem gas (patrocinada):
+
+```bash
+npm run gasless-tx
+```
+
+### Solução de Problemas
+
+#### Erro de Nonce
+Se encontrar erros relacionados a nonce:
+
+```bash
+npx hardhat clean
+npm run compile
+```
+
+#### Problemas com o Node Local
+Reinicie o node Hardhat:
+
+```bash
+# Ctrl+C para parar o node atual
+npm run node
+```
+
+#### Erro de Conexão com RPC
+Verifique se o node Hardhat esta rodando e se o URL no .env esta correto.
+
+#### Problemas com o Script de Inicialização
+Se o script `start:app` apresentar problemas:
+- Verifique se o script tem permissão de execução: `chmod +x scripts/start.sh scripts/stop.sh`
+- Certifique-se de que o diretório `logs` existe: `mkdir -p logs`
+
 ## Casos de test
 
 O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios críticos e habilitando novos casos de uso.
 
 - [x] 1. **Carteiras Inteligentes com Recuperação Social**
 - Permite redefinir chaves perdidas usando métodos como verificação por dispositivos confiáveis ou contatos predefinidos, eliminando a dependência de frases-semente[5][4].
-- Exemplo: Recuperação via autenticação em dois fatores (2FA) ou biometria (digital/facial)[1][5].
+- Exemplo: Recuperação via Autenticacao em dois fatores (2FA) ou biometria (digital/facial)[1][5].
 
 - [x] 2. **Transações Sem Custos de Gas (Gasless Transactions)**
 - Terceiros (como aplicativos ou patrocinadores) podem pagar taxas de rede, permitindo que usuários interajam com dApps sem precisar de ETH para gas[2][4].
 - Caso de uso: Promoções em jogos NFTs onde a plataforma subsidia o minting[1][5].
 
 - [x] 3. **Assinaturas Múltiplas e Controles Personalizados**
-- Crie regras complexas para transações, como exigir aprovação de múltiplas partes (ex: 2 de 3 assinaturas) ou limitar valores diários[4][5].
+- Crie regras complexas para transações, como exigir Aprovacao de múltiplas partes (ex: 2 de 3 assinaturas) ou limitar valores diarios[4][5].
 - Aplicação: Gestão de fundos corporativos ou tesourarias DAO com requisitos de segurança elevados[1][4].
 
 - [x] 4. **Pagamentos Recorrentes e Assinaturas**
@@ -43,8 +245,8 @@ O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios
 - Exemplo: Plataformas de streaming descentralizadas com cobrança mensal automática[1].
 
 - [x] 5. **Experiência Simplificada para Novos Usuários**
-- Criação de contas com autenticação biométrica (digital/facial) em smartphones, substituindo frases-semente complexas[1][5].
-- Impacto: Redução de barreiras para adoção em massa, especialmente para usuários não técnicos[1][4].
+- Criação de contas com Autenticacao biométrica (digital/facial) em smartphones, substituindo frases-semente complexas[1][5].
+- Impacto: Redução de barreiras para adoção em massa, especialmente para usuários nao técnicos[1][4].
 
 - [ ] 6. **Casos de uso BDD**
     - [ ] 6.1 Auth (2FA / Biometria)
@@ -64,7 +266,7 @@ O ERC-4332 introduz a **abstração de contas** na Ethereum, resolvendo desafios
 
 ## Transações Sem Custos de Gas (Gasless Transactions)
 
-Esta funcionalidade já está implementada no projeto. Veja como usar:
+Esta funcionalidade já esta implementada no projeto. Veja como usar:
 
 ### 1. Implantar o SponsorPaymaster
 
@@ -96,18 +298,18 @@ O SponsorPaymaster cobrirá os custos de gas para todas as transações enviadas
 
 1. O SponsorPaymaster é uma implementação de BasePaymaster do ERC-4337
 2. Ele mantém registros de contas e aplicativos patrocinados
-3. Quando uma UserOperation é enviada através do EntryPoint, o paymaster verifica se o remetente ou o destino está na lista de patrocinados
+3. Quando uma UserOperation é enviada através do EntryPoint, o paymaster verifica se o remetente ou o destino esta na lista de patrocinados
 4. Se estiver, o paymaster paga as taxas de gas em nome do usuário
 5. O financiador do paymaster (dono do contrato) é quem arca com os custos de gas
 
 Esse modelo é particularmente útil para:
-- Onboarding de novos usuários (que não possuem ETH)
+- Onboarding de novos usuários (que nao possuem ETH)
 - Promoções em jogos NFT (mint sem custo de gas)
 - Melhorar a experiência do usuário em dApps
 
 ## Assinaturas Múltiplas e Controles Personalizados
 
-Esta funcionalidade já está implementada no projeto. Veja como usar:
+Esta funcionalidade já esta implementada no projeto. Veja como usar:
 
 ### 1. Implantar a MultiSigAccountFactory
 
@@ -119,7 +321,7 @@ npx hardhat run scripts/deployMultiSigFactory.js --network localhost
 
 ```bash
 # Formato: npx hardhat run scripts/createMultiSigAccount.js -- <threshold> <dailyLimit> <txLimit> <owner1,owner2,...>
-# Exemplo para carteira 2-de-3 com limite diário de 1 ETH e limite por transação de 0.5 ETH:
+# Exemplo para carteira 2-de-3 com limite diario de 1 ETH e limite por transação de 0.5 ETH:
 npx hardhat run scripts/createMultiSigAccount.js --network localhost -- 2 1 0.5 0xOwner1,0xOwner2,0xOwner3
 ```
 
@@ -162,10 +364,10 @@ npm run multisig-tx -- propose 0xMultiSigAddress 0xDestinoAddress 0.1
 O sistema MultiSig implementa:
 
 1. **Propriedade compartilhada**: múltiplos donos com controle sobre a conta
-2. **Aprovação por quórum**: número mínimo de assinaturas para aprovar transações
-3. **Limites de valores**: limites por transação e diários
-4. **Expiração de propostas**: transações que não são executadas em tempo hábil expiram
-5. **Gerenciamento de permissões**: adicionar/remover donos via aprovação MultiSig
+2. **Aprovacao por quórum**: número minimo de assinaturas para aprovar transações
+3. **Limites de valores**: limites por transação e diarios
+4. **Expiração de propostas**: transações que nao são executadas em tempo hábil expiram
+5. **Gerenciamento de permissões**: adicionar/remover donos via Aprovacao MultiSig
 
 Ideal para:
 - Tesourarias corporativas
@@ -175,7 +377,7 @@ Ideal para:
 
 ## Pagamentos Recorrentes e Assinaturas
 
-Esta funcionalidade já está implementada no projeto. Veja como usar:
+Esta funcionalidade já esta implementada no projeto. Veja como usar:
 
 ### 1. Implantar a RecurringPaymentAccountFactory
 
@@ -263,9 +465,9 @@ Para automatizar completamente a execução de pagamentos recorrentes, você pod
 
 2. Integrar com um serviço de oráculos como Chainlink Automation (anteriormente Keeper) para executar transações on-chain quando necessário.
 
-## Experiência Simplificada para Novos Usuários (Autenticação Biométrica)
+## Experiência Simplificada para Novos Usuários (Autenticacao Biométrica)
 
-Esta funcionalidade já está implementada no projeto. Veja como usar:
+Esta funcionalidade já esta implementada no projeto. Veja como usar:
 
 ### 1. Implantar a BiometricAuthAccountFactory
 
@@ -275,15 +477,15 @@ npx hardhat run scripts/deployBiometricAuthFactory.js --network localhost
 npm run deploy-biometric-factory
 ```
 
-### 2. Criar uma conta com autenticação biométrica
+### 2. Criar uma conta com Autenticacao biométrica
 
 ```bash
 # Formato básico:
 npx hardhat run scripts/createBiometricAccount.js --network localhost
 
-# Formato com dispositivos personalizados e mínimo necessário:
+# Formato com dispositivos personalizados e minimo necessário:
 # npx hardhat run scripts/createBiometricAccount.js --network localhost device1,device2,device3 2
-# Onde os dispositivos são endereços Ethereum e o número é o mínimo necessário
+# Onde os dispositivos são endereços Ethereum e o número é o minimo necessário
 
 # Ou usando o alias NPM:
 npm run create-biometric-account
@@ -301,14 +503,14 @@ npx hardhat run scripts/manageBiometricDevices.js --network localhost -- add END
 # Remover um dispositivo:
 npx hardhat run scripts/manageBiometricDevices.js --network localhost -- remove ENDEREÇO_DA_CONTA ENDEREÇO_DO_DISPOSITIVO
 
-# Definir o número mínimo de dispositivos:
-npx hardhat run scripts/manageBiometricDevices.js --network localhost -- set-min ENDEREÇO_DA_CONTA NÚMERO_MÍNIMO
+# Definir o número minimo de dispositivos:
+npx hardhat run scripts/manageBiometricDevices.js --network localhost -- set-min ENDEREÇO_DA_CONTA NÚMERO_minimo
 
 # Ou usando o alias NPM:
 npm run manage-biometric-devices -- list ENDEREÇO_DA_CONTA
 ```
 
-### Frontend de Autenticação Biométrica
+### Frontend de Autenticacao Biométrica
 
 O projeto inclui uma interface de usuário para interagir com contas biométricas. Para usá-la:
 
@@ -319,18 +521,18 @@ O projeto inclui uma interface de usuário para interagir com contas biométrica
 
 ### Como funciona
 
-O sistema de autenticação biométrica implementa:
+O sistema de Autenticacao biométrica implementa:
 
 1. **Verificação de compatibilidade do dispositivo**: detecta se o dispositivo suporta biometria
-2. **Autenticação sem senha**: usa a biometria nativa do dispositivo em vez de senhas ou frases-semente
+2. **Autenticacao sem senha**: usa a biometria nativa do dispositivo em vez de senhas ou frases-semente
 3. **Múltiplos dispositivos**: permita adicionar diversos dispositivos biométricos à mesma conta
-4. **Redundância e segurança**: defina um número mínimo de dispositivos necessários para transações
+4. **Redundância e segurança**: defina um número minimo de dispositivos necessários para transações
 
 Este modelo é particularmente útil para:
 - Simplificar a experiência de novos usuários
 - Eliminar a necessidade de guardar frases-semente
 - Aumentar a segurança ao vincular a identidade física ao acesso à carteira
-- Reduzir barreiras de adoção para público não técnico
+- Reduzir barreiras de adoção para público nao técnico
 
 **Nota:** A implementação atual simula a API Web Authentication em navegadores. Em um ambiente de produção, recomenda-se utilizar a API WebAuthn para interagir com os sensores biométricos reais do dispositivo.
 
@@ -399,7 +601,7 @@ contract SimpleAccount is BaseAccount, Initializable, UUPSUpgradeable {
     event SimpleAccountInitialized(IEntryPoint indexed entryPoint, address indexed owner);
 
     modifier onlyOwner() {
-        require(msg.sender == owner || msg.sender == address(this), "não é o proprietário");
+        require(msg.sender == owner || msg.sender == address(this), "nao é o proprietario");
         _;
     }
 
@@ -437,7 +639,7 @@ contract SimpleAccount is BaseAccount, Initializable, UUPSUpgradeable {
      */
     function executeBatch(address[] calldata dest, bytes[] calldata func) external {
         _requireFromEntryPointOrOwner();
-        require(dest.length == func.length, "tamanhos de arrays incompatíveis");
+        require(dest.length == func.length, "tamanhos de arrays incompativeis");
         for (uint256 i = 0; i  0) {
             return SimpleAccount(payable(addr));
         }
@@ -736,11 +938,11 @@ async function init() {
     document.getElementById('depositToWallet').addEventListener('click', depositToWallet);
     document.getElementById('sendTransaction').addEventListener('click', sendTransaction);
     
-    // Verifica se o MetaMask está instalado
+    // Verifica se o MetaMask esta instalado
     if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
         
-        // Verifica se já está conectado
+        // Verifica se já esta conectado
         try {
             const accounts = await provider.listAccounts();
             if (accounts.length > 0) {
@@ -795,7 +997,7 @@ async function createSmartWallet() {
         const code = await provider.getCode(smartWalletAddress);
         
         if (code === '0x') {
-            // Carteira ainda não existe, vamos criá-la
+            // Carteira ainda nao existe, vamos criá-la
             console.log("Criando nova carteira inteligente...");
             const tx = await factoryContract.createAccount(ownerAddress, salt);
             
@@ -883,7 +1085,7 @@ async function sendTransaction() {
         document.getElementById('txStatusText').textContent = "Preparando transação...";
         document.getElementById('txStatus').classList.remove('hidden');
         
-        // Método 1: Transação direta (não usa ERC-4337)
+        // Método 1: Transação direta (nao usa ERC-4337)
         // Descomente este bloco para usar a abordagem tradicional
         /*
         const tx = await smartWalletContract.execute(

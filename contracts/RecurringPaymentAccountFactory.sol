@@ -17,7 +17,7 @@ contract RecurringPaymentAccountFactory {
     }
 
     /**
-     * Cria uma conta RecurringPayment, inicializando-a com o proprietário e salt
+     * Cria uma conta RecurringPayment, inicializando-a com o proprietario e salt
      */
     function createAccount(address owner, uint256 salt) public returns (RecurringPaymentAccount ret) {
         address addr = getAddress(owner, salt);

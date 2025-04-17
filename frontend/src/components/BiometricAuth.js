@@ -48,14 +48,14 @@ const BiometricAuth = () => {
       <div id="compatibility-message">
         {!isSupported && (
           <div className="alert alert-warning">
-            Seu dispositivo não suporta autenticação biométrica. 
-            Por favor, use outro método de autenticação.
+            Seu dispositivo nao suporta Autenticacao biométrica. 
+            Por favor, use outro método de Autenticacao.
           </div>
         )}
         
         {isSupported && status === 'idle' && (
           <div className="alert alert-success">
-            Seu dispositivo suporta autenticação biométrica.
+            Seu dispositivo suporta Autenticacao biométrica.
           </div>
         )}
       </div>
@@ -72,7 +72,7 @@ const BiometricAuth = () => {
       {status === 'registering' && (
         <div className="auth-process">
           <div className="loading-spinner"></div>
-          <p>Processando autenticação biométrica...</p>
+          <p>Processando Autenticacao biométrica...</p>
         </div>
       )}
       

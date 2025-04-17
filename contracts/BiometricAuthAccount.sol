@@ -10,16 +10,16 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 
 /**
- * Conta ERC-4337 com recursos de autenticação biométrica para pagamentos diários.
+ * Conta ERC-4337 com recursos de Autenticacao biométrica para pagamentos diarios.
  * Permite transações abaixo de um limite sem confirmação manual adicional.
  */
 contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     using ECDSA for bytes32;
 
-    // Proprietário da conta
+    // proprietario da conta
     address public owner;
     
-    // Dispositivos autorizados para autenticação biométrica
+    // Dispositivos autorizados para Autenticacao biométrica
     struct BiometricDevice {
         bytes32 deviceId;       // ID único do dispositivo (hash)
         string deviceName;      // Nome amigável do dispositivo
@@ -31,7 +31,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     mapping(bytes32 => BiometricDevice) public devices;
     bytes32[] public deviceIds;
     
-    // Limites diários por dispositivo
+    // Limites diarios por dispositivo
     mapping(bytes32 => uint256) public dailyLimit;
     
     // Controle de utilização diária por dispositivo
@@ -57,12 +57,12 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     event ManualTransactionExecuted(address indexed destination, uint256 amount);
     
     modifier onlyOwner() {
-        require(msg.sender == owner || msg.sender == address(this), "não é o proprietário");
+        require(msg.sender == owner || msg.sender == address(this), "not owner");
         _;
     }
     
     modifier deviceActive(bytes32 deviceId) {
-        require(devices[deviceId].active, "dispositivo inativo ou não registrado");
+        require(devices[deviceId].active, "device inactive or not registered");
         _;
     }
 
@@ -79,7 +79,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Inicializa a conta com o proprietário
+     * Inicializa a conta com o proprietario
      */
     function initialize(address anOwner) public virtual initializer {
         owner = anOwner;
@@ -88,7 +88,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
 
     /**
      * Valida a assinatura da operação do usuário.
-     * Aceita assinatura do proprietário ou verificação biométrica para transações abaixo do limite.
+     * Aceita assinatura do proprietario ou verificação biométrica para transações abaixo do limite.
      */
     function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash)
     internal virtual override returns (uint256 validationData) {
@@ -102,14 +102,15 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
             // Formato de assinatura biométrica
             bytes32 deviceId;
             bytes memory signature;
+            bytes memory sig = userOp.signature;
             
             // Extrair deviceId e assinatura
             assembly {
-                deviceId := mload(add(userOp.signature, 32))
-                signature := add(userOp.signature, 32)
+                deviceId := mload(add(sig, 32))
+                signature := add(sig, 32)
             }
             
-            // Verificar se o dispositivo está ativo
+            // Verificar se o dispositivo esta ativo
             if (!devices[deviceId].active) {
                 return SIG_VALIDATION_FAILED;
             }
@@ -127,7 +128,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
             
             return 0;
         } else {
-            // Assinatura padrão do proprietário
+            // Assinatura padrão do proprietario
             if (owner != hash.recover(userOp.signature)) {
                 return SIG_VALIDATION_FAILED;
             }
@@ -155,14 +156,14 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
 
     /**
-     * Registra um novo dispositivo para autenticação biométrica
+     * Registra um novo dispositivo para Autenticacao biométrica
      */
     function registerDevice(bytes32 deviceId, string calldata deviceName, uint256 initialDailyLimit) 
         external 
         onlyOwner 
     {
-        require(devices[deviceId].deviceId == bytes32(0), "dispositivo já registrado");
-        require(initialDailyLimit > 0, "limite diário deve ser positivo");
+        require(devices[deviceId].deviceId == bytes32(0), "device already registered");
+        require(initialDailyLimit > 0, "limite diario deve ser positivo");
         
         devices[deviceId] = BiometricDevice({
             deviceId: deviceId,
@@ -174,7 +175,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
         deviceIds.push(deviceId);
         dailyLimit[deviceId] = initialDailyLimit;
         
-        // Inicializa uso diário
+        // Inicializa uso diario
         dailyUsage[deviceId] = DailyUsage({
             used: 0,
             lastResetTime: block.timestamp
@@ -197,21 +198,21 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Define o limite diário para um dispositivo
+     * Define o limite diario para um dispositivo
      */
     function setDailyLimit(bytes32 deviceId, uint256 newLimit) 
         external 
         onlyOwner 
         deviceActive(deviceId) 
     {
-        require(newLimit > 0, "limite diário deve ser positivo");
+        require(newLimit > 0, "limite diario deve ser positivo");
         dailyLimit[deviceId] = newLimit;
         
         emit DailyLimitChanged(deviceId, newLimit);
     }
     
     /**
-     * Executa transação com verificação biométrica e limite diário
+     * Executa transação com verificação biométrica e limite diario
      * @param deviceId ID do dispositivo utilizado
      * @param dest Endereço de destino
      * @param value Valor da transação
@@ -228,7 +229,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
         external 
         deviceActive(deviceId) 
     {
-        require(msg.sender == owner || msg.sender == address(entryPoint()), "não autorizado");
+        require(msg.sender == owner || msg.sender == address(entryPoint()), "nao autorizado");
         
         // Resetar contagem diária se necessário
         if (block.timestamp > dailyUsage[deviceId].lastResetTime + 1 days) {
@@ -236,14 +237,14 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
             dailyUsage[deviceId].lastResetTime = block.timestamp;
         }
         
-        // Verificar se está dentro do limite diário
+        // Verificar se esta dentro do limite diario
         require(dailyUsage[deviceId].used + value <= dailyLimit[deviceId], "Excede limite");
         
         // Verificar assinatura biométrica (simplificado para exemplo)
         // Em produção, isso seria uma verificação complexa incluindo challenge-response
-        require(_verifyBiometricSignature(deviceId, biometricSignature), "Autenticação falhou");
+        require(_verifyBiometricSignature(deviceId, biometricSignature), "Autenticacao falhou");
         
-        // Atualizar uso diário
+        // Atualizar uso diario
         dailyUsage[deviceId].used += value;
         
         // Executar a transação
@@ -253,7 +254,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Modifier que verifica limites diários e autenticação biométrica
+     * Modifier que verifica limites diarios e Autenticacao biométrica
      */
     modifier biometricCheck(bytes32 deviceId, uint256 amount, bytes calldata biometricSignature) {
         // Resetar contagem diária se necessário
@@ -263,7 +264,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
         }
         
         require(amount <= dailyLimit[deviceId], "Excede limite");
-        require(_verifyBiometricSignature(deviceId, biometricSignature), "Autenticação falhou");
+        require(_verifyBiometricSignature(deviceId, biometricSignature), "Autenticacao falhou");
         _;
     }
     
@@ -290,7 +291,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Executa uma transação padrão (sem verificação biométrica)
      */
     function execute(address dest, uint256 value, bytes calldata func) external {
-        require(msg.sender == owner || msg.sender == address(entryPoint()), "não autorizado");
+        require(msg.sender == owner || msg.sender == address(entryPoint()), "nao autorizado");
         _call(dest, value, func);
         
         emit ManualTransactionExecuted(dest, value);
@@ -300,8 +301,8 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Executa um lote de transações
      */
     function executeBatch(address[] calldata dest, bytes[] calldata func) external {
-        require(msg.sender == owner || msg.sender == address(entryPoint()), "não autorizado");
-        require(dest.length == func.length, "tamanhos de arrays incompatíveis");
+        require(msg.sender == owner || msg.sender == address(entryPoint()), "nao autorizado");
+        require(dest.length == func.length, "tamanhos de arrays incompativeis");
         
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
@@ -322,7 +323,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Retorna uso diário atual e limite para um dispositivo
+     * Retorna uso diario atual e limite para um dispositivo
      */
     function getDailyUsage(bytes32 deviceId) 
         external 
@@ -330,7 +331,7 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
         deviceActive(deviceId)
         returns (uint256 used, uint256 limit, uint256 remaining) 
     {
-        // Calcular uso considerando possível reset diário
+        // Calcular uso considerando possível reset diario
         uint256 currentUsed = dailyUsage[deviceId].used;
         if (block.timestamp > dailyUsage[deviceId].lastResetTime + 1 days) {
             currentUsed = 0;

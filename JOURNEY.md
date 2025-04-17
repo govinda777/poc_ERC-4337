@@ -54,7 +54,7 @@ function validateUserOp(
 
 **Ações:**
 - Implementa `DeFiAccountFactory` usando Create2 para endereços determinísticos
-- Desenvolve método de inicialização que configura proprietários e parâmetros
+- Desenvolve método de inicialização que configura proprietarios e parâmetros
 - Implementa proxy para atualizações
 
 **Código Chave:**
@@ -118,13 +118,13 @@ Rafael implementa com sucesso uma carteira inteligente compatível com ERC-4337 
 
 ### Persona: Empresa CredFi e Isabella (CTO)
 
-CredFi é uma startup de crédito DeFi que busca atrair usuários não-técnicos, enquanto Isabella lidera a implementação técnica.
+CredFi é uma startup de crédito DeFi que busca atrair usuários nao-técnicos, enquanto Isabella lidera a implementação técnica.
 
 ### Fase 1: Identificação do Problema
 
 **Situação:**
 - 70% dos usuários abandonam o processo de onboarding ao precisar comprar ETH
-- Usuários não técnicos têm dificuldade em entender seed phrases
+- Usuários nao técnicos têm dificuldade em entender seed phrases
 
 **Metas de Implementação:**
 - Login com contas Google/Apple em vez de seed phrases
@@ -142,12 +142,12 @@ CredFi é uma startup de crédito DeFi que busca atrair usuários não-técnicos
 ```solidity
 // Em validateUserOp
 if (userOp.signature.length > 65) {
-    // Validação do JWT/Proof de autenticação social
+    // Validação do JWT/Proof de Autenticacao social
     bytes memory socialAuthProof = userOp.signature;
     bytes32 providerId = extractProviderFromProof(socialAuthProof);
     
     if (_verifyLoginProof(providerId, socialAuthProof)) {
-        return 0; // Autenticação social válida
+        return 0; // Autenticacao social válida
     }
 } else {
     // Validação padrão via ECDSA
@@ -169,9 +169,9 @@ function validatePaymasterUserOp(
     bytes32 userOpHash,
     uint256 maxCost
 ) external override returns (bytes memory context, uint256 validationData) {
-    // Verifica se usuário está elegível para subsídio
+    // Verifica se usuário esta elegível para subsídio
     require(isNewUser[userOp.sender] && transactionCount[userOp.sender] < 10, 
-            "Não elegível para subsídio");
+            "nao elegível para subsídio");
     
     // Limita custo máximo por transação
     require(maxCost <= maxSubsidyPerTransaction, "Custo excede limite");
@@ -185,7 +185,7 @@ function validatePaymasterUserOp(
 
 **Ações Técnicas:**
 - Desenvolve componentes React para login social integrado à Web3
-- Implementa servidor de autenticação que converte JWT em assinaturas
+- Implementa servidor de Autenticacao que converte JWT em assinaturas
 - Desenvolve sistema de recuperação por email
 - Implementa tracking de métricas
 
@@ -216,21 +216,21 @@ function validatePaymasterUserOp(
 
 ### Persona: Carla, Arquiteta Blockchain
 
-Carla está implementando tecnicamente o sistema de seguro DeFi com resgate automático baseado em conta abstraída.
+Carla esta implementando tecnicamente o sistema de seguro DeFi com resgate automático baseado em conta abstraída.
 
 ### Fase 1: Arquitetura do Sistema
 
 **Componentes Técnicos:**
-- `DeFiInsuranceAccount`: Conta ERC-4337 que monitora preços via oráculos
+- `DeFiInsuranceAccount`: Conta ERC-4337 que monitora precos via oráculos
 - `InsuranceFactory`: Deploy de contas determinísticas
 - `PriceMonitoringService`: Serviço off-chain para chamar liquidação
-- `ChainlinkPriceAdapter`: Integrando oráculos de preço
+- `ChainlinkPriceAdapter`: Integrando oráculos de preco
 
 ### Fase 2: Implementação da Conta de Seguro
 
 **Ações Técnicas:**
 - Desenvolve `DeFiInsuranceAccount` que implementa `BaseAccount`
-- Adiciona lógica para monitorar preço via oráculos Chainlink
+- Adiciona lógica para monitorar preco via oráculos Chainlink
 - Implementa função de liquidação automática
 
 **Código Chave:**
@@ -240,7 +240,7 @@ function _liquidatePosition() internal {
     liquidated = true;
     
     (uint256 price, bool valid) = oracle.fetchETHPrice();
-    require(valid && price <= triggerPrice, "Condição não atingida");
+    require(valid && price <= triggerPrice, "Condição nao atingida");
     
     // Registra evento com detalhes da liquidação
     emit PositionLiquidated(block.timestamp, price, address(this).balance);
@@ -251,10 +251,10 @@ function _liquidatePosition() internal {
 }
 ```
 
-### Fase 3: Sistema de Monitoramento de Preço
+### Fase 3: Sistema de Monitoramento de preco
 
 **Implementação Técnica:**
-- Desenvolve serviço em NodeJS que monitora preços e triggers
+- Desenvolve serviço em NodeJS que monitora precos e triggers
 - Implementa lógica para construir UserOperation para chamada externa
 - Cria sistema de alerta e notificações
 
@@ -264,12 +264,12 @@ async function checkAccounts() {
   // Busca contas ativas
   const accounts = await db.getActiveInsuranceAccounts();
   
-  // Busca preço atual do ETH
+  // Busca preco atual do ETH
   const ethPrice = await priceOracle.getEthPrice();
   
   for (const account of accounts) {
     if (ethPrice <= account.triggerPrice) {
-      // Preço abaixo do trigger, executa liquidação
+      // preco abaixo do trigger, executa liquidação
       const userOp = buildUserOperation({
         sender: account.address,
         callData: insuranceInterface.encodeFunctionData("executeLiquidation", []),
@@ -305,7 +305,7 @@ async function checkAccounts() {
 ### Fase 5: Testes de Estresse e Segurança
 
 **Ações Técnicas:**
-- Realiza testes de simulação de queda de preço abrupta
+- Realiza testes de simulação de queda de preco abrupta
 - Verifica comportamento sob congestionamento de rede
 - Testa tentativas de front-running ou manipulação
 - Audita segurança dos contratos
@@ -313,7 +313,7 @@ async function checkAccounts() {
 **Resultado:**
 Carla implementa uma solução técnica completa que permite:
 1. Criação de contas de seguro compatíveis com ERC-4337
-2. Monitoramento contínuo de preços
+2. Monitoramento contínuo de precos
 3. Execução automatizada de liquidações via Account Abstraction
 4. Notificações em tempo real aos usuários
 
@@ -394,7 +394,7 @@ function validatePaymasterUserOp(
     (address token, uint256 tokenAmount) = _decodeTokenData(paymasterAndData);
     
     // Verifica se token é suportado
-    require(supportedTokens[token], "Token não suportado");
+    require(supportedTokens[token], "Token nao suportado");
     
     // Calcula taxa de conversão token->ETH
     uint256 ethValue = _convertTokenToEth(token, tokenAmount);

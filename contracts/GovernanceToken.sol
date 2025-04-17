@@ -17,9 +17,10 @@ contract GovernanceToken is ERC20, Ownable {
         uint8 tokenDecimals,
         uint256 initialSupply,
         address initialOwner
-    ) ERC20(name, symbol) Ownable(initialOwner) {
+    ) ERC20(name, symbol) {
         _decimals = tokenDecimals;
         _mint(initialOwner, initialSupply * 10**tokenDecimals);
+        _transferOwnership(initialOwner);
     }
 
     function decimals() public view virtual override returns (uint8) {
@@ -27,7 +28,7 @@ contract GovernanceToken is ERC20, Ownable {
     }
 
     /**
-     * @dev Permite ao proprietário cunhar tokens adicionais
+     * @dev Permite ao proprietario cunhar tokens adicionais
      * @param to Endereço do destinatário
      * @param amount Quantidade de tokens a serem cunhados
      */

@@ -39,11 +39,11 @@ async function init() {
     document.getElementById('depositToWallet').addEventListener('click', depositToWallet);
     document.getElementById('sendTransaction').addEventListener('click', sendTransaction);
     
-    // Verifica se o MetaMask está instalado
+    // Verifica se o MetaMask esta instalado
     if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
         
-        // Verifica se já está conectado
+        // Verifica se já esta conectado
         try {
             const accounts = await provider.listAccounts();
             if (accounts.length > 0) {
@@ -99,7 +99,7 @@ async function createSmartWallet() {
         const code = await provider.getCode(smartWalletAddress);
         
         if (code === '0x') {
-            // Carteira ainda não existe, vamos criá-la
+            // Carteira ainda nao existe, vamos criá-la
             console.log("Criando nova carteira inteligente...");
             const tx = await factoryContract.createAccount(ownerAddress, salt);
             
@@ -198,7 +198,7 @@ async function sendTransaction() {
             if (!isAccountSponsored && !isAppSponsored) {
                 // Tenta patrocinar a carteira automaticamente
                 try {
-                    document.getElementById('txStatusText').textContent = "Conta não patrocinada. Patrocinando...";
+                    document.getElementById('txStatusText').textContent = "Conta nao patrocinada. Patrocinando...";
                     const sponsorTx = await paymasterContract.sponsorAddress(smartWalletAddress);
                     await sponsorTx.wait();
                     document.getElementById('txStatusText').textContent = "Conta patrocinada com sucesso!";
@@ -217,10 +217,10 @@ async function sendTransaction() {
             }
         } catch (error) {
             console.error("Erro ao verificar patrocínio:", error);
-            document.getElementById('txStatusText').textContent += " Não foi possível verificar patrocínio.";
+            document.getElementById('txStatusText').textContent += " nao foi possível verificar patrocínio.";
         }
         
-        // Método 1: Transação direta se não for patrocinado
+        // Método 1: Transação direta se nao for patrocinado
         if (!isAccountSponsored && !isAppSponsored) {
             document.getElementById('txStatusText').textContent = "Enviando transação direta...";
             const tx = await smartWalletContract.execute(
@@ -251,7 +251,7 @@ async function sendTransaction() {
         // Obtém o nonce atual
         const nonce = await entryPointContract.getNonce(smartWalletAddress, 0);
         
-        // Obtém os preços de gás atuais
+        // Obtém os precos de gás atuais
         const feeData = await provider.getFeeData();
         const maxFeePerGas = feeData.maxFeePerGas || feeData.gasPrice;
         const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas || ethers.BigNumber.from(1);
@@ -329,7 +329,7 @@ async function sendTransaction() {
                 const reason = ethers.utils.toUtf8String("0x" + error.data.substring(10));
                 document.getElementById('txStatusText').textContent += " Motivo: " + reason;
             } catch (e) {
-                // Se não conseguir decodificar o motivo, apenas registra o erro
+                // Se nao conseguir decodificar o motivo, apenas registra o erro
                 console.error("Erro ao decodificar o motivo da falha:", e);
             }
         }

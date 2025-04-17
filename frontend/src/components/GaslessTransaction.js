@@ -37,7 +37,7 @@ const GaslessTransaction = () => {
       
       {!isSponsoredAccount && (
         <div className="alert alert-warning">
-          Sua conta não está patrocinada. Transações exigirão ETH para gas.
+          Sua conta nao esta patrocinada. Transações exigirão ETH para gas.
         </div>
       )}
       

@@ -20,14 +20,14 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
 
     // Propriedades de gerenciamento de assinaturas
     EnumerableSet.AddressSet private _owners;
-    uint256 public signatureThreshold;  // Número mínimo de assinaturas necessárias
+    uint256 public signatureThreshold;  // Número minimo de assinaturas necessárias
     
     // Estrutura para limites de transações
     struct TransactionLimit {
-        uint256 dailyLimit;      // Limite de valor diário
+        uint256 dailyLimit;      // Limite de valor diario
         uint256 txLimit;         // Limite por transação
         uint256 dailyUsed;       // Valor usado hoje
-        uint256 lastResetTime;   // Quando o limite diário foi redefinido
+        uint256 lastResetTime;   // Quando o limite diario foi redefinido
     }
     
     TransactionLimit public transactionLimit;
@@ -65,22 +65,22 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     
     // Modificadores
     modifier onlyOwner() {
-        require(_owners.contains(msg.sender), "não é um dono");
+        require(_owners.contains(msg.sender), "not an owner");
         _;
     }
     
     modifier onlySelf() {
-        require(msg.sender == address(this), "apenas a própria conta");
+        require(msg.sender == address(this), "only the account itself");
         _;
     }
     
     modifier txExists(uint256 txIndex) {
-        require(txIndex < transactionCount, "tx não existe");
+        require(txIndex < transactionCount, "tx does not exist");
         _;
     }
     
     modifier notExecuted(uint256 txIndex) {
-        require(!transactions[txIndex].executed, "tx já executada");
+        require(!transactions[txIndex].executed, "tx ja executada");
         _;
     }
     
@@ -90,7 +90,7 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     modifier notConfirmed(uint256 txIndex) {
-        require(!confirmations[txIndex][msg.sender], "tx já confirmada");
+        require(!confirmations[txIndex][msg.sender], "tx ja confirmada");
         _;
     }
 
@@ -109,8 +109,8 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     /**
      * Inicializa a conta multi-assinatura
      * @param initialOwners Lista inicial de donos
-     * @param initialThreshold Número mínimo de assinaturas necessárias
-     * @param initialDailyLimit Limite diário de transações (em wei)
+     * @param initialThreshold Número minimo de assinaturas necessárias
+     * @param initialDailyLimit Limite diario de transações (em wei)
      * @param initialTxLimit Limite por transação (em wei)
      */
     function initialize(
@@ -120,12 +120,12 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
         uint256 initialTxLimit
     ) public virtual initializer {
         require(initialOwners.length > 0, "pelo menos um dono");
-        require(initialThreshold > 0 && initialThreshold <= initialOwners.length, "limite inválido");
+        require(initialThreshold > 0 && initialThreshold <= initialOwners.length, "limite invalido");
         
         for (uint256 i = 0; i < initialOwners.length; i++) {
             address owner = initialOwners[i];
-            require(owner != address(0), "dono não pode ser endereço zero");
-            require(!_owners.contains(owner), "donos não podem ser duplicados");
+            require(owner != address(0), "dono nao pode ser endereco zero");
+            require(!_owners.contains(owner), "donos nao podem ser duplicados");
             _owners.add(owner);
         }
         
@@ -142,7 +142,7 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
 
     /**
      * Valida a assinatura da operação do usuário.
-     * No modo multisig, aceita a assinatura de qualquer proprietário.
+     * No modo multisig, aceita a assinatura de qualquer proprietario.
      */
     function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash)
     internal virtual override returns (uint256 validationData) {
@@ -160,7 +160,7 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Verifica se a chamada vem do entryPoint ou do próprio contrato
      */
     function _requireFromEntryPointOrSelf() internal view {
-        require(msg.sender == address(entryPoint()) || msg.sender == address(this), "conta: não autorizado");
+        require(msg.sender == address(entryPoint()) || msg.sender == address(this), "conta: nao autorizado");
     }
 
     /**
@@ -193,11 +193,11 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
         onlyOwner 
         returns (uint256 txIndex) 
     {
-        require(destination != address(0), "destino não pode ser endereço zero");
+        require(destination != address(0), "destino nao pode ser endereco zero");
         
-        // Validar limites de transação, se não forem zero
+        // Validar limites de transação, se nao forem zero
         if (transactionLimit.txLimit > 0) {
-            require(value <= transactionLimit.txLimit, "excede o limite por transação");
+            require(value <= transactionLimit.txLimit, "excede o limite por transacao");
         }
         
         txIndex = transactionCount;
@@ -251,19 +251,19 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     {
         Transaction storage transaction = transactions[txIndex];
         
-        require(transaction.numConfirmations >= signatureThreshold, "confirmações insuficientes");
+        require(transaction.numConfirmations >= signatureThreshold, "confirmacoes insuficientes");
         
-        // Verificar limites diários
+        // Verificar limites diarios
         if (transactionLimit.dailyLimit > 0) {
-            // Resetar o contador diário, se necessário
+            // Resetar o contador diario, se necessário
             if (block.timestamp > transactionLimit.lastResetTime + 1 days) {
                 transactionLimit.dailyUsed = 0;
                 transactionLimit.lastResetTime = block.timestamp;
             }
             
-            // Verificar se excede o limite diário
+            // Verificar se excede o limite diario
             require(transactionLimit.dailyUsed + transaction.value <= transactionLimit.dailyLimit, 
-                    "excede limite diário");
+                    "excede limite diario");
             
             // Atualizar valor usado
             transactionLimit.dailyUsed += transaction.value;
@@ -293,7 +293,7 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
      */
     function executeBatch(address[] calldata dest, bytes[] calldata func) external {
         _requireFromEntryPointOrSelf();
-        require(dest.length == func.length, "tamanhos de arrays incompatíveis");
+        require(dest.length == func.length, "tamanhos de arrays incompativeis");
         
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
@@ -303,11 +303,11 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     // ----- Funções de gerenciamento da conta -----
     
     /**
-     * Adiciona um novo dono (requer aprovação multisig)
+     * Adiciona um novo dono (requer Aprovacao multisig)
      */
     function addOwner(address newOwner) external onlySelf {
-        require(newOwner != address(0), "dono não pode ser endereço zero");
-        require(!_owners.contains(newOwner), "já é um dono");
+        require(newOwner != address(0), "dono nao pode ser endereco zero");
+        require(!_owners.contains(newOwner), "ja e um dono");
         
         _owners.add(newOwner);
         
@@ -315,11 +315,11 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Remove um dono existente (requer aprovação multisig)
+     * Remove um dono existente (requer Aprovacao multisig)
      */
     function removeOwner(address owner) external onlySelf {
-        require(_owners.contains(owner), "não é um dono");
-        require(_owners.length() > signatureThreshold, "não pode reduzir abaixo do limite");
+        require(_owners.contains(owner), "nao e um dono");
+        require(_owners.length() > signatureThreshold, "nao pode reduzir abaixo do limite");
         
         _owners.remove(owner);
         
@@ -327,11 +327,11 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Altera o número mínimo de assinaturas (requer aprovação multisig)
+     * Altera o número minimo de assinaturas (requer Aprovacao multisig)
      */
     function changeThreshold(uint256 newThreshold) external onlySelf {
         require(newThreshold > 0, "limite deve ser positivo");
-        require(newThreshold <= _owners.length(), "limite não pode exceder número de donos");
+        require(newThreshold <= _owners.length(), "limite nao pode exceder numero de donos");
         
         signatureThreshold = newThreshold;
         
@@ -339,7 +339,7 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Altera o limite diário (requer aprovação multisig)
+     * Altera o limite diario (requer Aprovacao multisig)
      */
     function changeDailyLimit(uint256 newLimit) external onlySelf {
         transactionLimit.dailyLimit = newLimit;
@@ -348,7 +348,7 @@ contract MultiSigAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Altera o limite por transação (requer aprovação multisig)
+     * Altera o limite por transação (requer Aprovacao multisig)
      */
     function changeTransactionLimit(uint256 newLimit) external onlySelf {
         transactionLimit.txLimit = newLimit;

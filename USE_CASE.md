@@ -7,7 +7,7 @@ Vamos desmistificar o ERC-4337 com **casos de uso práticos** e **exemplos espec
 ## 1. **Onboarding Simplificado em Jogos Play-to-Earn**
 **Problema:** Novos jogadores precisam comprar ETH antes de jogar.  
 **Solução ERC-4337:**  
-- Carteira inteligente criada via autenticação social (Google/Apple ID).  
+- Carteira inteligente criada via Autenticacao social (Google/Apple ID).  
 - Primeiras transações subsidiadas pelo jogo via Paymaster.  
 **Exemplo:**  
 ```solidity
@@ -29,7 +29,7 @@ contract GamePaymaster {
 ```solidity
 function recoverAccess(address[] newSigners) {
     require(block.timestamp >= recoveryCooldown, "Aguarde 7 dias");
-    require(newSigners.length >= 3, "Mínimo 3 signatários");
+    require(newSigners.length >= 3, "minimo 3 signatários");
     _updateSigners(newSigners); // Atualiza sem necessidade de seed phrase
 }
 ```
@@ -40,25 +40,25 @@ function recoverAccess(address[] newSigners) {
 
 ---
 
-## 3. **Assinaturas Biométricas para Pagamentos Diários**
-**Aplicação:** Carteira de gastos diários com limite pré-definido.  
+## 3. **Assinaturas Biométricas para Pagamentos diarios**
+**Aplicação:** Carteira de gastos diarios com limite pré-definido.  
 **Funcionamento:**  
-- Autenticação via digital no smartphone  
-- Limite diário de R$ 500 em transações automáticas  
+- Autenticacao via digital no smartphone  
+- Limite diario de R$ 500 em transações automáticas  
 **Código de Validação:**  
 ```solidity
 modifier biometricCheck(uint amount) {
     require(amount <= dailyLimit[msg.sender], "Excede limite");
-    require(_verifyBiometricSignature(), "Autenticação falhou");
+    require(_verifyBiometricSignature(), "Autenticacao falhou");
     _;
 }
 ```
-**Vantagem:** Transações abaixo do limite não exigem confirmação manual[2][5].
+**Vantagem:** Transações abaixo do limite nao exigem confirmação manual[2][5].
 
 ---
 
-## 4. **Leilão Automático de NFTs com Lances Complexos**
-**Caso:** Leilão que aceita ETH + Tokens de Governança como pagamento.  
+## 4. **Leilao Automático de NFTs com Lances Complexos**
+**Caso:** Leilao que aceita ETH + Tokens de Governança como pagamento.  
 **Implementação ERC-4337:**  
 ```solidity
 function placeBid(uint auctionId, uint ethAmount, uint tokenAmount) {
@@ -74,13 +74,13 @@ function placeBid(uint auctionId, uint ethAmount, uint tokenAmount) {
 ## 5. **Seguro DeFi com Resgate Automático**
 **Modelo:**  
 - Usuário deposita ETH em protocolo de seguro  
-- Smart contract monitora preço via oráculo  
+- Smart contract monitora preco via oráculo  
 - Liquidação automática se ETH cair 20% em 24h  
 **Código-Chave:**  
 ```solidity
 function executeLiquidation() external {
     (uint price, bool valid) = oracle.fetchETHPrice();
-    require(valid && price <= triggerPrice, "Condição não atingida");
+    require(valid && price <= triggerPrice, "Condição nao atingida");
     _liquidatePosition(msg.sender); // Executa sem intervenção
 }
 ```
@@ -110,7 +110,7 @@ Usuário define regras → Contrato verifica saldo → Execução automática
 
 ---
 
-Esses casos mostram como o ERC-4337 está **redefinindo interações blockchain** em setores como:
+Esses casos mostram como o ERC-4337 esta **redefinindo interações blockchain** em setores como:
 - **Varejo:** Checkout com 1 clique usando tokens de fidelidade  
 - **Saúde:** Acesso compartilhado a registros médicos via NFTs  
 - **Logística:** Pagamentos automáticos ao cumprir etapas de entrega  

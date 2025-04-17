@@ -24,7 +24,7 @@ export const useBiometricAuth = () => {
         setHasCredential(hasExistingCredential);
       } catch (err) {
         console.error('Erro ao verificar compatibilidade:', err);
-        setError('Não foi possível verificar a compatibilidade do dispositivo');
+        setError('nao foi possível verificar a compatibilidade do dispositivo');
         setIsSupported(false);
       } finally {
         setIsChecking(false);
@@ -43,7 +43,7 @@ export const useBiometricAuth = () => {
       // Verificar novamente se o dispositivo é compatível
       const isCompatible = await BiometricService.checkDeviceCompatibility();
       if (!isCompatible) {
-        throw new Error('Seu dispositivo não suporta autenticação biométrica');
+        throw new Error('Seu dispositivo nao suporta Autenticacao biométrica');
       }
       
       // Registrar biometria
@@ -62,7 +62,7 @@ export const useBiometricAuth = () => {
       };
     } catch (err) {
       console.error('Erro ao registrar biometria:', err);
-      setError(err.message || 'Falha ao registrar autenticação biométrica');
+      setError(err.message || 'Falha ao registrar Autenticacao biométrica');
       throw err;
     } finally {
       setIsRegistering(false);
@@ -94,8 +94,8 @@ export const useBiometricAuth = () => {
         walletAddress
       };
     } catch (err) {
-      console.error('Erro na autenticação biométrica:', err);
-      setError(err.message || 'Falha na autenticação biométrica');
+      console.error('Erro na Autenticacao biométrica:', err);
+      setError(err.message || 'Falha na Autenticacao biométrica');
       throw err;
     } finally {
       setIsAuthenticating(false);

@@ -11,8 +11,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
-import "./NFTAuction.sol";
+import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 /**
  * @title AuctionAccount
@@ -21,7 +20,6 @@ import "./NFTAuction.sol";
  */
 contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
     using ECDSA for bytes32;
-    using MessageHashUtils for bytes32;
 
     // EntryPoint singleton que será autorizado a chamar esta conta
     IEntryPoint private immutable _entryPoint;
@@ -38,10 +36,11 @@ contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
     /**
      * @dev Construtor que inicializa a conta 
      * @param entryPointAddress Endereço do contrato EntryPoint
-     * @param owner_ Proprietário da conta
+     * @param owner_ proprietario da conta
      */
-    constructor(address entryPointAddress, address owner_) Ownable(owner_) {
+    constructor(address entryPointAddress, address owner_) {
         _entryPoint = IEntryPoint(entryPointAddress);
+        _transferOwnership(owner_);
     }
     
     /**
@@ -97,8 +96,8 @@ contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
     
     /**
      * @dev Função especializada para fazer lances em leilões com ETH + tokens
-     * @param auction Endereço do contrato de leilão
-     * @param nftId ID do NFT no leilão
+     * @param auction Endereço do contrato de Leilao
+     * @param nftId ID do NFT no Leilao
      * @param ethAmount Quantidade de ETH para o lance
      * @param governanceToken Endereço do token de governança
      * @param tokenAmount Quantidade de tokens para o lance
@@ -112,7 +111,7 @@ contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
     ) external {
         _requireFromEntryPointOrOwner();
         
-        // Aprova tokens para o contrato de leilão
+        // Aprova tokens para o contrato de Leilao
         if (tokenAmount > 0 && governanceToken != address(0)) {
             bytes memory approveCall = abi.encodeWithSelector(
                 IERC20.approve.selector,
@@ -122,7 +121,7 @@ contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
             _call(governanceToken, 0, approveCall);
         }
         
-        // Faz o lance no leilão
+        // Faz o lance no Leilao
         bytes memory bidCall = abi.encodeWithSelector(
             bytes4(keccak256("placeBid(uint256,address,uint256)")),
             nftId,
@@ -165,7 +164,7 @@ contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
     }
     
     /**
-     * @dev Requer que o chamador seja o EntryPoint ou o proprietário
+     * @dev Requer que o chamador seja o EntryPoint ou o proprietario
      */
     function _requireFromEntryPointOrOwner() internal view {
         require(msg.sender == address(entryPoint()) || msg.sender == owner(), "account: not Owner or EntryPoint");
@@ -194,11 +193,18 @@ contract AuctionAccount is BaseAccount, IERC721Receiver, Ownable {
      * @dev Função para receber ETH
      */
     receive() external payable {}
+    
+    /**
+     * @dev Função de inicialização que será chamada pelo proxy
+     */
+    function initialize(address owner_) external {
+        _transferOwnership(owner_);
+    }
 }
 
 /**
  * @title AuctionAccountFactory
- * @dev Factory para criar contas de leilão compatíveis com ERC-4337
+ * @dev Factory para criar contas de Leilao compatíveis com ERC-4337
  */
 contract AuctionAccountFactory {
     AuctionAccount public immutable accountImplementation;
@@ -210,8 +216,8 @@ contract AuctionAccountFactory {
     }
     
     /**
-     * @dev Cria uma nova conta para o proprietário dado
-     * @param owner O proprietário da conta
+     * @dev Cria uma nova conta para o proprietario dado
+     * @param owner O proprietario da conta
      * @param salt Salt para o endereço da conta
      * @return ret A nova conta
      */
@@ -240,8 +246,8 @@ contract AuctionAccountFactory {
     }
     
     /**
-     * @dev Calcula o endereço da conta para um proprietário e salt
-     * @param owner O proprietário da conta
+     * @dev Calcula o endereço da conta para um proprietario e salt
+     * @param owner O proprietario da conta
      * @param salt Salt para a criação
      * @return O endereço da conta
      */
@@ -262,7 +268,7 @@ contract AuctionAccountFactory {
 }
 
 // Interface simplificada do NFTAuction para evitar dependências circulares
-interface NFTAuction {
+interface INFTAuction {
     function governanceToken() external view returns (address);
     function placeBid(uint256 auctionId, uint256 tokenAmount) external payable;
     function createAuction(

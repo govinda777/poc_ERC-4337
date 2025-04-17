@@ -9,7 +9,7 @@ const Home = () => {
     {
       id: 'social-login',
       name: 'Login Social',
-      description: 'Autenticação via Google/Apple sem seed phrases.',
+      description: 'Autenticacao via Google/Apple sem seed phrases.',
       icon: <FaWallet className="w-10 h-10 text-indigo-500" />,
       path: '/social-login',
       color: 'bg-indigo-50 border-indigo-200',
@@ -17,7 +17,7 @@ const Home = () => {
     {
       id: 'defi-insurance',
       name: 'Seguro DeFi',
-      description: 'Proteção automática contra quedas de preço.',
+      description: 'Proteção automática contra quedas de preco.',
       icon: <FaShieldAlt className="w-10 h-10 text-green-500" />,
       path: '/defi-insurance',
       color: 'bg-green-50 border-green-200',
@@ -65,13 +65,13 @@ const Home = () => {
             <div className="flex-1 bg-white bg-opacity-10 rounded-lg p-3">
               <div className="text-sm opacity-80">Wallet EOA</div>
               <div className="font-mono text-sm truncate">
-                {isConnected ? account : 'Não conectado'}
+                {isConnected ? account : 'nao conectado'}
               </div>
             </div>
             <div className="flex-1 bg-white bg-opacity-10 rounded-lg p-3">
               <div className="text-sm opacity-80">Smart Account</div>
               <div className="font-mono text-sm truncate">
-                {hasSmartAccount ? smartAccountAddress : 'Não criada'}
+                {hasSmartAccount ? smartAccountAddress : 'nao criada'}
               </div>
             </div>
           </div>

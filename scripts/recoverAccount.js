@@ -4,13 +4,13 @@ const fs = require("fs");
 async function main() {
   // Carrega os endereços dos contratos implantados
   if (!fs.existsSync("addresses.json")) {
-    console.error("Arquivo addresses.json não encontrado. Execute deploy.js e createAccount.js primeiro.");
+    console.error("Arquivo addresses.json nao encontrado. Execute deploy.js e createAccount.js primeiro.");
     process.exit(1);
   }
 
   const addresses = JSON.parse(fs.readFileSync("addresses.json", "utf8"));
   if (!addresses.account) {
-    console.error("Endereço da conta não encontrado em addresses.json. Execute createAccount.js primeiro.");
+    console.error("Endereço da conta nao encontrado em addresses.json. Execute createAccount.js primeiro.");
     process.exit(1);
   }
   
@@ -27,21 +27,21 @@ async function main() {
   const guardian2Address = await guardian2.getAddress();
   const newOwnerAddress = await newOwner.getAddress();
   
-  // Verifica o proprietário atual
+  // Verifica o proprietario atual
   const currentOwner = await socialAccount.owner();
-  console.log("Proprietário atual:", currentOwner);
+  console.log("proprietario atual:", currentOwner);
   
   // Verifica se os guardiões estão configurados
   const isGuardian1 = await socialAccount.guardians(guardian1Address);
   const isGuardian2 = await socialAccount.guardians(guardian2Address);
   
   if (!isGuardian1 || !isGuardian2) {
-    console.error("Guardiões não configurados. Execute manageGuardians.js primeiro.");
+    console.error("Guardiões nao configurados. Execute manageGuardians.js primeiro.");
     process.exit(1);
   }
   
   console.log("Simulando o processo de recuperação de conta...");
-  console.log(`Novo proprietário será: ${newOwnerAddress}`);
+  console.log(`Novo proprietario será: ${newOwnerAddress}`);
   
   // Guardião 1 inicia o processo de recuperação
   console.log("\n1. Guardião 1 inicia o processo de recuperação...");
@@ -52,7 +52,7 @@ async function main() {
   // Verificar o status da recuperação
   let status = await socialAccount.getRecoveryStatus();
   console.log("\nStatus da recuperação:");
-  console.log(`Novo proprietário: ${status[0]}`);
+  console.log(`Novo proprietario: ${status[0]}`);
   console.log(`Aprovações: ${status[1]}`);
   console.log(`Timestamp: ${new Date(status[2] * 1000)}`);
   console.log(`Pode executar: ${status[3]}`);
@@ -66,7 +66,7 @@ async function main() {
   // Verificar o status da recuperação novamente
   status = await socialAccount.getRecoveryStatus();
   console.log("\nStatus da recuperação atualizado:");
-  console.log(`Novo proprietário: ${status[0]}`);
+  console.log(`Novo proprietario: ${status[0]}`);
   console.log(`Aprovações: ${status[1]}`);
   console.log(`Timestamp: ${new Date(status[2] * 1000)}`);
   console.log(`Pode executar: ${status[3]}`);
@@ -90,7 +90,7 @@ async function main() {
   // Verificar o status da recuperação após o tempo avançado
   status = await socialAccount.getRecoveryStatus();
   console.log("\nStatus da recuperação após o período de espera:");
-  console.log(`Novo proprietário: ${status[0]}`);
+  console.log(`Novo proprietario: ${status[0]}`);
   console.log(`Aprovações: ${status[1]}`);
   console.log(`Timestamp: ${new Date(status[2] * 1000)}`);
   console.log(`Pode executar: ${status[3]}`);
@@ -101,15 +101,15 @@ async function main() {
   await tx.wait();
   console.log("Recuperação executada com sucesso!");
   
-  // Verificar o novo proprietário
+  // Verificar o novo proprietario
   const newCurrentOwner = await socialAccount.owner();
-  console.log("\nProprietário antigo:", currentOwner);
-  console.log("Proprietário novo:", newCurrentOwner);
+  console.log("\nproprietario antigo:", currentOwner);
+  console.log("proprietario novo:", newCurrentOwner);
   
   if (newCurrentOwner.toLowerCase() === newOwnerAddress.toLowerCase()) {
     console.log("\nProcesso de recuperação concluído com sucesso!");
   } else {
-    console.error("\nProblema na recuperação: o proprietário não foi alterado.");
+    console.error("\nProblema na recuperação: o proprietario nao foi alterado.");
   }
 }
 

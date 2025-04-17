@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
- * Contrato de leilão de NFTs que aceita combinação de ETH + tokens de governança
+ * Contrato de Leilao de NFTs que aceita combinação de ETH + tokens de governança
  */
 contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
@@ -16,15 +16,15 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     // Token de governança aceito como parte do pagamento
     IERC20 public govToken;
     
-    // Estrutura para armazenar informações do leilão
+    // Estrutura para armazenar informações do Leilao
     struct Auction {
         uint256 tokenId;        // ID do NFT sendo leiloado
         address nftContract;    // Contrato do NFT
         address payable seller; // Endereço do vendedor
-        uint256 startingPrice;  // Preço inicial em ETH
+        uint256 startingPrice;  // preco inicial em ETH
         uint256 minTokenAmount; // Quantidade mínima de tokens de governança
-        uint256 endTime;        // Timestamp de fim do leilão
-        bool active;            // Se o leilão está ativo
+        uint256 endTime;        // Timestamp de fim do Leilao
+        bool active;            // Se o Leilao esta ativo
         
         // Informações do lance atual
         address payable highestBidder;
@@ -43,7 +43,7 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     // Mapeamento de auctions por ID
     mapping(uint256 => Auction) public auctions;
     
-    // Histórico de lances por leilão
+    // Histórico de lances por Leilao
     mapping(uint256 => Bid[]) public auctionBids;
     
     // Contador de leilões
@@ -68,7 +68,7 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * Cria um novo leilão
+     * Cria um novo Leilao
      */
     function createAuction(
         uint256 tokenId,
@@ -77,15 +77,15 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
         uint256 minTokenAmount,
         uint256 duration
     ) external returns (uint256) {
-        require(startingPrice > 0, "Preço inicial deve ser maior que zero");
-        require(minTokenAmount > 0, "Quantidade de tokens deve ser maior que zero");
-        require(duration >= 1 hours, "Duração mínima de 1 hora");
-        require(duration <= 30 days, "Duração máxima de 30 dias");
+        require(startingPrice > 0, "Starting price must be greater than zero");
+        require(minTokenAmount > 0, "Token amount must be greater than zero");
+        require(duration >= 1 hours, "Minimum duration is 1 hour");
+        require(duration <= 30 days, "Maximum duration is 30 days");
         
         // Transfere o NFT para o contrato
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
         
-        // Cria o leilão
+        // Cria o Leilao
         uint256 auctionId = auctionIdCounter++;
         uint256 endTime = block.timestamp + duration;
         
@@ -108,7 +108,7 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * Dá um lance no leilão usando ETH + tokens de governança
+     * Dá um lance no Leilao usando ETH + tokens de governança
      */
     function placeBid(uint256 auctionId, uint256 tokenAmount) 
         external
@@ -117,22 +117,22 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     {
         Auction storage auction = auctions[auctionId];
         
-        require(auction.active, "Leilão não está ativo");
-        require(block.timestamp < auction.endTime, "Leilão encerrado");
-        require(msg.sender != auction.seller, "Vendedor não pode dar lance");
-        require(msg.value >= auction.startingPrice, "Lance em ETH abaixo do preço mínimo");
+        require(auction.active, "Auction is not active");
+        require(block.timestamp < auction.endTime, "Leilao encerrado");
+        require(msg.sender != auction.seller, "Vendedor nao pode dar lance");
+        require(msg.value >= auction.startingPrice, "Lance em ETH abaixo do preco minimo");
         require(tokenAmount >= auction.minTokenAmount, "Quantidade de tokens insuficiente");
         
         // Verifica se o lance atual é maior que o anterior
         require(
             msg.value > auction.highestEthBid || 
             (msg.value == auction.highestEthBid && tokenAmount > auction.highestTokenBid),
-            "Lance não supera o maior lance atual"
+            "Lance nao supera o maior lance atual"
         );
         
         // Verifica se o usuário tem tokens suficientes e permitiu o contrato a transferi-los
         require(govToken.balanceOf(msg.sender) >= tokenAmount, "Saldo de tokens insuficiente");
-        require(govToken.allowance(msg.sender, address(this)) >= tokenAmount, "Aprovação de tokens insuficiente");
+        require(govToken.allowance(msg.sender, address(this)) >= tokenAmount, "Aprovacao de tokens insuficiente");
         
         // Devolve o lance anterior
         if (auction.highestBidder != address(0)) {
@@ -159,7 +159,7 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
             timestamp: block.timestamp
         }));
         
-        // Estende o leilão se estiver nos últimos 10 minutos
+        // Estende o Leilao se estiver nos últimos 10 minutos
         if (auction.endTime - block.timestamp < 10 minutes) {
             auction.endTime += 10 minutes;
         }
@@ -177,22 +177,22 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     {
         Auction storage auction = auctions[auctionId];
         
-        require(auction.active, "Leilão não está ativo");
-        require(block.timestamp < auction.endTime, "Leilão encerrado");
-        require(msg.sender != auction.seller, "Vendedor não pode dar lance");
-        require(ethAmount >= auction.startingPrice, "Lance em ETH abaixo do preço mínimo");
+        require(auction.active, "Leilao nao esta ativo");
+        require(block.timestamp < auction.endTime, "Leilao encerrado");
+        require(msg.sender != auction.seller, "Vendedor nao pode dar lance");
+        require(ethAmount >= auction.startingPrice, "Lance em ETH abaixo do preco minimo");
         require(tokenAmount >= auction.minTokenAmount, "Quantidade de tokens insuficiente");
         
         // Verifica se o lance atual é maior que o anterior
         require(
             ethAmount > auction.highestEthBid || 
             (ethAmount == auction.highestEthBid && tokenAmount > auction.highestTokenBid),
-            "Lance não supera o maior lance atual"
+            "Lance nao supera o maior lance atual"
         );
         
         // Verifica se o usuário tem tokens suficientes e permitiu o contrato a transferi-los
         require(govToken.balanceOf(msg.sender) >= tokenAmount, "Saldo de tokens insuficiente");
-        require(govToken.allowance(msg.sender, address(this)) >= tokenAmount, "Aprovação de tokens insuficiente");
+        require(govToken.allowance(msg.sender, address(this)) >= tokenAmount, "Aprovacao de tokens insuficiente");
         
         // Devolve o lance anterior
         if (auction.highestBidder != address(0)) {
@@ -211,7 +211,7 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
         // Transfere ETH do usuário para o contrato
         require(msg.sender.balance >= ethAmount, "Saldo ETH insuficiente");
         (bool success, ) = address(this).call{value: ethAmount}("");
-        require(success, "Transferência de ETH falhou");
+        require(success, "transferencia de ETH falhou");
         
         // Transfere os tokens para o contrato
         govToken.safeTransferFrom(msg.sender, address(this), tokenAmount);
@@ -224,7 +224,7 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
             timestamp: block.timestamp
         }));
         
-        // Estende o leilão se estiver nos últimos 10 minutos
+        // Estende o Leilao se estiver nos últimos 10 minutos
         if (auction.endTime - block.timestamp < 10 minutes) {
             auction.endTime += 10 minutes;
         }
@@ -233,17 +233,17 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * Finaliza um leilão
+     * Finaliza um Leilao
      */
     function finalizeAuction(uint256 auctionId) external nonReentrant {
         Auction storage auction = auctions[auctionId];
         
-        require(auction.active, "Leilão não está ativo");
+        require(auction.active, "Leilao nao esta ativo");
         require(
             block.timestamp >= auction.endTime || 
             msg.sender == owner() || 
             msg.sender == auction.seller,
-            "Leilão ainda não encerrado"
+            "Leilao ainda nao encerrado"
         );
         
         auction.active = false;
@@ -269,8 +269,8 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
             }
             
             if (tokensToBurn > 0) {
-                // Queimar tokens (contrato deve ter permissão)
-                govToken.burn(tokensToBurn);
+                // Queimar tokens (transferir para endereço morto)
+                govToken.safeTransfer(address(0x000000000000000000000000000000000000dEaD), tokensToBurn);
             }
             
             emit AuctionFinalized(auctionId, auction.highestBidder, auction.highestEthBid, auction.highestTokenBid);
@@ -283,12 +283,12 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * Cancela um leilão (apenas vendedor ou admin)
+     * Cancela um Leilao (apenas vendedor ou admin)
      */
     function cancelAuction(uint256 auctionId) external {
         Auction storage auction = auctions[auctionId];
         
-        require(auction.active, "Leilão não está ativo");
+        require(auction.active, "Leilao nao esta ativo");
         require(msg.sender == auction.seller || msg.sender == owner(), "Apenas vendedor ou admin");
         
         auction.active = false;
@@ -309,21 +309,21 @@ contract ComplexNFTAuction is ReentrancyGuard, Ownable {
      * Modifica a proporção de tokens que são queimados vs. enviados ao vendedor
      */
     function setBurnRatio(uint256 newRatio) external onlyOwner {
-        require(newRatio <= PERCENTAGE_BASE, "Razão não pode exceder 100%");
+        require(newRatio <= PERCENTAGE_BASE, "Razao nao pode exceder 100%");
         burnRatio = newRatio;
         
         emit BurnRatioChanged(newRatio);
     }
     
     /**
-     * Retorna todos os lances de um leilão
+     * Retorna todos os lances de um Leilao
      */
     function getAuctionBids(uint256 auctionId) external view returns (Bid[] memory) {
         return auctionBids[auctionId];
     }
     
     /**
-     * Retorna detalhes de um leilão
+     * Retorna detalhes de um Leilao
      */
     function getAuction(uint256 auctionId) external view returns (
         uint256 tokenId,

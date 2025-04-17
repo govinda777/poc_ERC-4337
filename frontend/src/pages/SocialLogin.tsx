@@ -42,11 +42,11 @@ const SocialLogin = () => {
     setIsLoading(true);
     
     try {
-      // Simular autenticação com provedor social
+      // Simular Autenticacao com provedor social
       // Em produção, integraria com OAuth real
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Gerar código de autenticação mock
+      // Gerar código de Autenticacao mock
       const mockCode = `auth_${provider}_${Math.random().toString(36).substring(2, 10)}`;
       setMockAuthCode(mockCode);
       
@@ -54,7 +54,7 @@ const SocialLogin = () => {
       setIsLoading(false);
     } catch (error) {
       console.error('Erro ao autenticar:', error);
-      toast.error('Falha na autenticação');
+      toast.error('Falha na Autenticacao');
       setIsLoading(false);
       setSelectedProvider(null);
     }
@@ -71,7 +71,7 @@ const SocialLogin = () => {
     setAccountStatus('creating');
 
     try {
-      // Em um cenário real, enviaríamos o código de autenticação para um backend
+      // Em um cenário real, enviaríamos o código de Autenticacao para um backend
       // para verificar e gerar uma assinatura que seria usada na criação da conta
       
       await createSmartAccount('social');
@@ -90,7 +90,7 @@ const SocialLogin = () => {
   // Função para assinar mensagem com a conta inteligente
   const handleSignMessage = async () => {
     if (!hasSmartAccount || !smartAccountAddress) {
-      toast.error('Conta inteligente não encontrada');
+      toast.error('Conta inteligente nao encontrada');
       return;
     }
 
@@ -141,7 +141,7 @@ const SocialLogin = () => {
             Como funciona?
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Este demo mostra como criar uma conta ERC-4337 com autenticação social.
+            Este demo mostra como criar uma conta ERC-4337 com Autenticacao social.
             Conecte sua carteira, escolha um provedor social, e crie uma conta inteligente 
             que você pode usar sem precisar da carteira original novamente.
           </p>
@@ -167,7 +167,7 @@ const SocialLogin = () => {
             <span className={`ml-2 text-sm px-2 py-1 rounded ${hasSmartAccount ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
               {hasSmartAccount 
                 ? `${smartAccountAddress?.slice(0, 6)}...${smartAccountAddress?.slice(-4)}` 
-                : 'Não criada'}
+                : 'nao criada'}
             </span>
           </div>
         </div>

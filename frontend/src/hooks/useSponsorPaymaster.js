@@ -10,7 +10,7 @@ export const useSponsorPaymaster = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
   
-  // Verificar se a conta atual está patrocinada
+  // Verificar se a conta atual esta patrocinada
   useEffect(() => {
     const checkSponsorStatus = async () => {
       if (!isInitialized || !smartWalletAddress) {
@@ -24,7 +24,7 @@ export const useSponsorPaymaster = () => {
         setIsSponsoredAccount(status);
       } catch (err) {
         console.error('Erro ao verificar status do patrocínio:', err);
-        setError('Não foi possível verificar se sua conta está patrocinada');
+        setError('nao foi possível verificar se sua conta esta patrocinada');
         setIsSponsoredAccount(false);
       } finally {
         setIsChecking(false);
@@ -34,11 +34,11 @@ export const useSponsorPaymaster = () => {
     checkSponsorStatus();
   }, [isInitialized, smartWalletAddress]);
   
-  // Verificar se um endereço específico está patrocinado
+  // Verificar se um endereço específico esta patrocinado
   const checkSponsorStatusForAddress = useCallback(async (address) => {
     try {
       // Em uma implementação real, faria uma chamada para o contrato Paymaster
-      // ou para um serviço de backend para verificar se o endereço está na lista de patrocinados
+      // ou para um serviço de backend para verificar se o endereço esta na lista de patrocinados
       
       // Exemplo simplificado para demonstração:
       // Simula que alguns endereços estão patrocinados com base em um hash simples
@@ -67,15 +67,15 @@ export const useSponsorPaymaster = () => {
   // Enviar transação patrocinada (gasless)
   const sendGaslessTransaction = useCallback(async (recipient, amount, data = '0x') => {
     if (!isInitialized || !smartWalletAddress) {
-      throw new Error('Carteira não inicializada');
+      throw new Error('Carteira nao inicializada');
     }
     
     try {
       setError(null);
       
-      // Verificar se a conta está patrocinada
+      // Verificar se a conta esta patrocinada
       if (!isSponsoredAccount) {
-        throw new Error('Esta conta não está patrocinada para transações gasless');
+        throw new Error('Esta conta nao esta patrocinada para transações gasless');
       }
       
       // Aqui usaríamos o Web3Service para enviar a transação via EntryPoint
@@ -98,7 +98,7 @@ export const useSponsorPaymaster = () => {
   // Solicitar patrocínio para a conta atual
   const requestSponsorship = useCallback(async () => {
     if (!isInitialized || !smartWalletAddress) {
-      throw new Error('Carteira não inicializada');
+      throw new Error('Carteira nao inicializada');
     }
     
     try {

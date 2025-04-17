@@ -4,7 +4,7 @@ const fs = require("fs");
 async function main() {
   // Carrega os endereços dos contratos implantados
   if (!fs.existsSync("addresses.json")) {
-    console.error("Arquivo addresses.json não encontrado. Execute deploy.js primeiro.");
+    console.error("Arquivo addresses.json nao encontrado. Execute deploy.js primeiro.");
     process.exit(1);
   }
 

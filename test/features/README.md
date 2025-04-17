@@ -1,26 +1,26 @@
 # BDD Tests for Complex NFT Auction
 
-Este diretório contém testes Behavior-Driven Development (BDD) para o caso de uso de Leilão Automático de NFTs com Lances Complexos.
+Este diretório contém testes Behavior-Driven Development (BDD) para o caso de uso de Leilao Automático de NFTs com Lances Complexos.
 
 ## O que é BDD?
 
-BDD (Behavior-Driven Development) é uma metodologia de desenvolvimento que enfoca o comportamento esperado do software a partir da perspectiva do usuário. Os testes são escritos em linguagem natural usando a sintaxe Gherkin (Given-When-Then), tornando-os compreensíveis por stakeholders não-técnicos.
+BDD (Behavior-Driven Development) é uma metodologia de desenvolvimento que enfoca o comportamento esperado do software a partir da perspectiva do usuário. Os testes são escritos em linguagem natural usando a sintaxe Gherkin (Given-When-Then), tornando-os compreensíveis por stakeholders nao-técnicos.
 
 ## Estrutura dos Testes
 
 - **features/**: Contém os arquivos `.feature` que descrevem os comportamentos esperados
-  - **complex-nft-auction.feature**: Especificações do leilão de NFTs com lances complexos
+  - **complex-nft-auction.feature**: Especificações do Leilao de NFTs com lances complexos
 - **steps/**: Contém os arquivos que implementam os passos descritos nos arquivos `.feature`
-  - **complex-nft-auction.steps.js**: Implementação dos passos para o teste de leilão
+  - **complex-nft-auction.steps.js**: Implementação dos passos para o teste de Leilao
 
 ## Cenários Testados
 
-1. **Criação de Leilão**: Verifica a criação de um novo leilão com um NFT
+1. **Criação de Leilao**: Verifica a criação de um novo Leilao com um NFT
 2. **Lances com ETH e Tokens**: Testa a funcionalidade de dar lances combinando ETH e tokens de governança
 3. **Superação de Lances**: Verifica o comportamento quando um lance é superado por outro usuário
 4. **Validações de Lances**: Testa as validações para lances com ETH ou tokens insuficientes
-5. **Finalização de Leilão**: Verifica o processo de encerramento de um leilão bem-sucedido
-6. **Cancelamento de Leilão**: Testa o cancelamento de um leilão pelo vendedor
+5. **Finalização de Leilao**: Verifica o processo de encerramento de um Leilao bem-sucedido
+6. **Cancelamento de Leilao**: Testa o cancelamento de um Leilao pelo vendedor
 7. **Integração com ERC-4337**: Verifica o uso de contas ERC-4337 para dar lances complexos
 
 ## Como Executar os Testes

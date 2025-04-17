@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERC-4337 - Autenticação Biométrica</title>
+    <title>ERC-4337 - Autenticacao Biométrica</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .biometric-section {
@@ -105,22 +105,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>ERC-4337 com Autenticação Biométrica</h1>
+        <h1>ERC-4337 com Autenticacao Biométrica</h1>
         
         <!-- Detecção de biometria -->
         <div class="card">
             <h2>Detecção de Biometria</h2>
-            <p>Verificando se seu dispositivo suporta autenticação biométrica...</p>
+            <p>Verificando se seu dispositivo suporta Autenticacao biométrica...</p>
             
             <div id="biometricStatus" class="status-badge">Verificando...</div>
             
             <div id="bioNotSupported" class="hidden">
-                <p>Seu dispositivo não suporta autenticação biométrica ou o navegador não tem as APIs necessárias.</p>
+                <p>Seu dispositivo nao suporta Autenticacao biométrica ou o navegador nao tem as APIs necessárias.</p>
                 <p>Para uma experiência completa, tente usar um dispositivo móvel com suporte a biometria.</p>
             </div>
             
             <div id="bioSupported" class="hidden">
-                <p>Seu dispositivo suporta autenticação biométrica!</p>
+                <p>Seu dispositivo suporta Autenticacao biométrica!</p>
                 <p>Você pode criar uma conta com acesso biométrico e gerenciar seus ativos com a segurança da sua impressão digital ou reconhecimento facial.</p>
             </div>
         </div>
@@ -148,7 +148,7 @@
                         <path d="M12 0c-6.63 0-12 5.37-12 12s5.37 12 12 12 12-5.37 12-12-5.37-12-12-12zm0 22c-5.52 0-10-4.48-10-10s4.48-10 10-10 10 4.48 10 10-4.48 10-10 10zm1-13c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm-6 9c0-2.76 2.24-5 5-5s5 2.24 5 5h2c0-3.86-3.14-7-7-7s-7 3.14-7 7h2zm0-5c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zm11 0c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1z"/>
                     </svg>
                 </div>
-                <p>Toque no ícone acima para criar uma conta de smart wallet com autenticação biométrica</p>
+                <p>Toque no ícone acima para criar uma conta de smart wallet com Autenticacao biométrica</p>
                 <button id="createBiometricAccountBtn" class="bio-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.5 2c-3.13 0-5.7 2.14-6.39 5h-3.11l2 2 2-2h-0.95c0.64-1.73 2.28-3 4.45-3 2.5 0 4.5 2 4.5 4.5 0 2.21-1.58 4-3.86 4.41-0.28 0.05-0.5 0.27-0.5 0.55v0.5c0 0.33 0.26 0.58 0.59 0.56 3.12-0.22 5.61-2.68 5.61-5.83 0-3.3-2.7-6-6-6zm-1 5c0 0.55 0.45 1 1 1s1-0.45 1-1-0.45-1-1-1-1 0.45-1 1zm0 5.28v0.72c0 0.55 0.45 1 1 1s1-0.45 1-1v-0.66c-0.66-0.25-1.22-0.67-1.66-1.22-0.15 0.33-0.27 0.71-0.34 1.16z"/></svg>
                     Criar com Biometria
@@ -175,7 +175,7 @@
             
             <div id="deviceStats">
                 <p>Dispositivos ativos: <span id="deviceCount">-</span></p>
-                <p>Mínimo necessário: <span id="minDevices">-</span></p>
+                <p>minimo necessário: <span id="minDevices">-</span></p>
             </div>
             
             <div class="device-list" id="deviceList">
@@ -261,7 +261,7 @@
                     biometricStatusEl.classList.add('supported');
                     bioSupportedEl.classList.remove('hidden');
                 } else {
-                    biometricStatusEl.textContent = 'Não suportado';
+                    biometricStatusEl.textContent = 'nao suportado';
                     biometricStatusEl.classList.add('not-supported');
                     bioNotSupportedEl.classList.remove('hidden');
                 }
@@ -321,7 +321,7 @@
             }
             
             if (!biometricsSupported) {
-                alert("Seu dispositivo não suporta autenticação biométrica!");
+                alert("Seu dispositivo nao suporta Autenticacao biométrica!");
                 return;
             }
             
@@ -417,7 +417,7 @@
                 deviceCountEl.textContent = deviceCount.toString();
                 minDevicesEl.textContent = minDevices.toString();
                 
-                // Não podemos listar os dispositivos diretamente por limitação da blockchain
+                // nao podemos listar os dispositivos diretamente por limitação da blockchain
                 // Em uma implementação real, seria necessário um banco de dados off-chain
             } catch (error) {
                 console.error("Erro ao atualizar informações de dispositivos:", error);

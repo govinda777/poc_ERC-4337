@@ -33,7 +33,7 @@ const RecurringPayments = () => {
         setSubscriptions(subs);
       } catch (err) {
         console.error('Erro ao carregar assinaturas:', err);
-        setError('Não foi possível carregar suas assinaturas. Tente novamente.');
+        setError('nao foi possível carregar suas assinaturas. Tente novamente.');
       } finally {
         setIsLoading(false);
       }
@@ -170,7 +170,7 @@ const RecurringPayments = () => {
                 value={newSubscription.period}
                 onChange={(e) => setNewSubscription({...newSubscription, period: e.target.value})}
               >
-                <option value="1">Diário</option>
+                <option value="1">diario</option>
                 <option value="7">Semanal</option>
                 <option value="30">Mensal</option>
                 <option value="365">Anual</option>

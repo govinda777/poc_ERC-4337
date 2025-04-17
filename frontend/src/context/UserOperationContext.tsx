@@ -105,7 +105,7 @@ export const UserOperationContextProvider = ({
   // Assinar uma UserOperation
   const signUserOperation = async (userOp: UserOperation): Promise<UserOperation> => {
     if (!signer || !entryPointAddress) {
-      toast.error('Carteira ou EntryPoint não configurados');
+      toast.error('Carteira ou EntryPoint nao configurados');
       throw new Error('Configuração incompleta');
     }
 

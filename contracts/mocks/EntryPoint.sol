@@ -6,7 +6,7 @@ pragma solidity ^0.8.12;
 
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
-contract EntryPoint is IEntryPoint {
+abstract contract EntryPoint is IEntryPoint {
     // Implementação mínima para o exemplo
     address private owner;
 
@@ -30,10 +30,10 @@ contract EntryPoint is IEntryPoint {
 
     function simulateHandleOp(UserOperation calldata op, address target, bytes calldata targetCallData) external override {}
 
-    function deposit() external payable override {}
+    function deposit() external payable {}
 
     function getDepositInfo(address account) external view override returns (DepositInfo memory info) {
-        return DepositInfo(0, 0, false);
+        return DepositInfo(0, false, 0, 0, 0);
     }
 
     function balanceOf(address account) external view override returns (uint256) {

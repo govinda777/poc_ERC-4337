@@ -34,11 +34,11 @@ const MultiSigWallet = () => {
       setTransactions(txList);
     } catch (err) {
       console.error("Erro ao carregar transações:", err);
-      setError("Não foi possível carregar as transações. Tente novamente.");
+      setError("nao foi possível carregar as transações. Tente novamente.");
     }
   };
   
-  // Lógica para adicionar/remover proprietários
+  // Lógica para adicionar/remover proprietarios
   const addOwner = () => setOwners([...owners, '']);
   
   const removeOwner = (index) => {
@@ -47,14 +47,14 @@ const MultiSigWallet = () => {
       newOwners.splice(index, 1);
       setOwners(newOwners);
       
-      // Ajuste o threshold para não exceder o número de proprietários
+      // Ajuste o threshold para nao exceder o número de proprietarios
       if (threshold > newOwners.length) {
         setThreshold(newOwners.length);
       }
     }
   };
   
-  // Lógica para atualizar endereço do proprietário
+  // Lógica para atualizar endereço do proprietario
   const updateOwner = (index, address) => {
     const newOwners = [...owners];
     newOwners[index] = address;
@@ -71,7 +71,7 @@ const MultiSigWallet = () => {
       const validOwners = owners.filter(o => o !== '');
       
       if (validOwners.length < threshold) {
-        throw new Error("O número de proprietários não pode ser menor que o threshold");
+        throw new Error("O número de proprietarios nao pode ser menor que o threshold");
       }
       
       await createMultiSig(
@@ -127,7 +127,7 @@ const MultiSigWallet = () => {
       <div className="card-body">
         <form onSubmit={handleCreate}>
           <div className="form-group mb-3">
-            <label>Proprietários</label>
+            <label>proprietarios</label>
             {owners.map((owner, index) => (
               <div key={index} className="input-group mb-2">
                 <input 
@@ -135,7 +135,7 @@ const MultiSigWallet = () => {
                   className="form-control"
                   value={owner}
                   onChange={(e) => updateOwner(index, e.target.value)}
-                  placeholder="Endereço do proprietário"
+                  placeholder="Endereço do proprietario"
                 />
                 <button 
                   type="button" 
@@ -152,7 +152,7 @@ const MultiSigWallet = () => {
               className="btn btn-outline-primary"
               onClick={addOwner}
             >
-              Adicionar Proprietário
+              Adicionar proprietario
             </button>
           </div>
           
@@ -170,7 +170,7 @@ const MultiSigWallet = () => {
           </div>
           
           <div className="form-group mb-3">
-            <label htmlFor="dailyLimit">Limite Diário (ETH)</label>
+            <label htmlFor="dailyLimit">Limite diario (ETH)</label>
             <input 
               type="number" 
               id="dailyLimit"
@@ -351,8 +351,8 @@ const MultiSigWallet = () => {
             <div className="card-body">
               <p><strong>Endereço:</strong> {walletInfo.address}</p>
               <p><strong>Threshold:</strong> {walletInfo.threshold}</p>
-              <p><strong>Proprietários:</strong> {walletInfo.owners.length}</p>
-              <p><strong>Limite Diário:</strong> {walletInfo.dailyLimit} ETH</p>
+              <p><strong>proprietarios:</strong> {walletInfo.owners.length}</p>
+              <p><strong>Limite diario:</strong> {walletInfo.dailyLimit} ETH</p>
               <p><strong>Limite por Transação:</strong> {walletInfo.transactionLimit} ETH</p>
             </div>
           </div>

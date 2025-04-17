@@ -41,7 +41,7 @@ contract AuctionNFT is ERC721URIStorage, Ownable {
     }
     
     /**
-     * Cria um lote de NFTs para um leilão
+     * Cria um lote de NFTs para um Leilao
      * @param to Endereço que receberá os NFTs
      * @param count Número de NFTs a criar
      * @param baseURI URI base para os metadados

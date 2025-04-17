@@ -18,7 +18,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
     using ECDSA for bytes32;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    // Proprietário da conta
+    // proprietario da conta
     address public owner;
     IEntryPoint private immutable _entryPoint;
     
@@ -31,7 +31,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
         uint256 endTime;         // Quando a assinatura termina (0 = sem fim)
         uint256 lastExecuted;    // Última vez que foi executada
         bytes data;              // Dados adicionais da transação (ex: calldata)
-        bool active;             // Se a assinatura está ativa
+        bool active;             // Se a assinatura esta ativa
     }
     
     // Mapeamento de assinaturas por ID
@@ -76,7 +76,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
     }
     
     /**
-     * Inicializa a conta para um proprietário
+     * Inicializa a conta para um proprietario
      */
     function initialize(address anOwner) public virtual initializer {
         owner = anOwner;
@@ -95,7 +95,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
     }
 
     /**
-     * Verifica se a chamada vem do entryPoint ou do proprietário
+     * Verifica se a chamada vem do entryPoint ou do proprietario
      */
     function _requireFromEntryPointOrOwner() internal view {
         require(msg.sender == address(entryPoint()) || msg.sender == owner, "account: not authorized");
@@ -256,12 +256,12 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
     {
         Subscription storage sub = subscriptions[subscriptionId];
         
-        // Verifica se já está no período de início
+        // Verifica se já esta no período de início
         if (block.timestamp < sub.startTime) {
             return false;
         }
         
-        // Verifica se não ultrapassou o período de término (se houver)
+        // Verifica se nao ultrapassou o período de término (se houver)
         if (sub.endTime != 0 && block.timestamp > sub.endTime) {
             // Desativa automaticamente assinaturas expiradas
             sub.active = false;
@@ -352,7 +352,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
             : sub.lastExecuted + sub.periodSeconds;
             
         if (sub.endTime != 0 && next > sub.endTime) {
-            next = 0; // Não haverá mais execuções
+            next = 0; // nao haverá mais execuções
         }
         
         return (
@@ -393,7 +393,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
         
         // Verifica se já passou do tempo de término
         if (sub.endTime != 0 && next > sub.endTime) {
-            return 0; // Não haverá mais execuções
+            return 0; // nao haverá mais execuções
         }
         
         return next;
@@ -412,7 +412,7 @@ contract RecurringPaymentAccount is BaseAccount, Initializable, UUPSUpgradeable 
             uint256 subId = activeIds[i];
             Subscription storage sub = subscriptions[subId];
             
-            // Verifica se já está no período de início e não ultrapassou o fim
+            // Verifica se já esta no período de início e nao ultrapassou o fim
             if (block.timestamp < sub.startTime) {
                 continue;
             }

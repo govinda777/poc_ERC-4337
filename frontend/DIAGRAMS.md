@@ -234,7 +234,7 @@ sequenceDiagram
     Factory->>Factory: getAddress(owner, salt)
     Factory->>Factory: Verifica se conta já existe
     
-    alt Conta não existe
+    alt Conta nao existe
         Factory->>SmartAccount: CREATE2 deploy
         SmartAccount->>SmartAccount: Inicializa
         SmartAccount-->>Factory: Conta criada
@@ -274,7 +274,7 @@ sequenceDiagram
     participant Target as Contrato Destino
     
     User->>MobileApp: Login com Google
-    MobileApp->>AuthServer: Solicita autenticação
+    MobileApp->>AuthServer: Solicita Autenticacao
     AuthServer->>AuthServer: Verifica credenciais
     AuthServer-->>MobileApp: Retorna JWT
     
@@ -427,7 +427,7 @@ sequenceDiagram
     StressTest-->>CI: Relatório de performance
     
     CI->>CI: Compila resultados
-    CI->>CI: Verifica critérios de aprovação
+    CI->>CI: Verifica critérios de Aprovacao
     CI->>CI: Gera relatório completo
 ```
 

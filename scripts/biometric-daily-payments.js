@@ -1,18 +1,18 @@
-// Este script demonstra o fluxo completo de carteira com autenticação biométrica para pagamentos diários
+// Este script demonstra o fluxo completo de carteira com Autenticacao biométrica para pagamentos diarios
 // 1. Implanta a fábrica de carteiras biométricas
-// 2. Cria uma nova carteira com limite diário de R$ 500 (ou ~0.15 ETH)
-// 3. Registra dispositivos e simula transações com e sem autenticação biométrica
+// 2. Cria uma nova carteira com limite diario de R$ 500 (ou ~0.15 ETH)
+// 3. Registra dispositivos e simula transações com e sem Autenticacao biométrica
 
 const hre = require("hardhat");
 const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("Iniciando demonstração de Pagamentos Diários com Autenticação Biométrica (ERC-4337)");
+  console.log("Iniciando demonstração de Pagamentos diarios com Autenticacao Biométrica (ERC-4337)");
   
   // Obter signers para simulação
   const [deployer, owner, recipient1, recipient2] = await ethers.getSigners();
   
-  // Definir limites de gastos diários (R$ 500 convertidos para ETH ~0.15 ETH na época)
+  // Definir limites de gastos diarios (R$ 500 convertidos para ETH ~0.15 ETH na época)
   const DAILY_LIMIT = ethers.utils.parseEther("0.15");
   
   // Gerar IDs para dispositivos (baseado em hash para simular identificadores biométricos)
@@ -33,7 +33,7 @@ async function main() {
   await factory.deployed();
   console.log("BiometricAuthAccountFactory implantado em:", factory.address);
   
-  console.log("Criando nova carteira com autenticação biométrica...");
+  console.log("Criando nova carteira com Autenticacao biométrica...");
   // Criar nova carteira
   const tx = await factory.createAccount(owner.address, 12345); // salt = 12345 para exemplo
   const receipt = await tx.wait();
@@ -56,7 +56,7 @@ async function main() {
   
   console.log("Saldo da carteira:", ethers.utils.formatEther(await ethers.provider.getBalance(wallet.address)), "ETH");
   
-  // Registrar dispositivos com limites diários
+  // Registrar dispositivos com limites diarios
   console.log("\nRegistrando dispositivos biométricos:");
   console.log("- Registrando smartphone principal com limite de 0.15 ETH/dia (~R$ 500)");
   await wallet.connect(owner).registerDevice(deviceId1, "Smartphone Principal", DAILY_LIMIT);
@@ -74,7 +74,7 @@ async function main() {
     console.log(`  Ativo: ${devices[i].active}`);
     
     const dailyLimit = await wallet.dailyLimit(devices[i].deviceId);
-    console.log(`  Limite diário: ${ethers.utils.formatEther(dailyLimit)} ETH`);
+    console.log(`  Limite diario: ${ethers.utils.formatEther(dailyLimit)} ETH`);
   }
   
   // Criar assinatura biométrica simulada (para exemplo)
@@ -111,9 +111,9 @@ async function main() {
   
   console.log(`Transação executada! Enviado ${ethers.utils.formatEther(value1)} ETH para ${recipient1.address}`);
   
-  // Verificar uso diário
+  // Verificar uso diario
   const usage1 = await wallet.getDailyUsage(deviceId1);
-  console.log("Uso diário após primeira transação:");
+  console.log("Uso diario após primeira transação:");
   console.log("- Usado:", ethers.utils.formatEther(usage1.used), "ETH");
   console.log("- Limite:", ethers.utils.formatEther(usage1.limit), "ETH");
   console.log("- Restante:", ethers.utils.formatEther(usage1.remaining), "ETH");
@@ -136,9 +136,9 @@ async function main() {
   
   console.log(`Transação executada! Enviado ${ethers.utils.formatEther(value2)} ETH para ${recipient2.address}`);
   
-  // Verificar uso diário
+  // Verificar uso diario
   const usage2 = await wallet.getDailyUsage(deviceId1);
-  console.log("Uso diário após segunda transação:");
+  console.log("Uso diario após segunda transação:");
   console.log("- Usado:", ethers.utils.formatEther(usage2.used), "ETH");
   console.log("- Limite:", ethers.utils.formatEther(usage2.limit), "ETH");
   console.log("- Restante:", ethers.utils.formatEther(usage2.remaining), "ETH");
@@ -159,10 +159,10 @@ async function main() {
       "0x", // sem dados adicionais
       biometricSignature3
     );
-    console.log("Transação executada - não deveria ser possível!");
+    console.log("Transação executada - nao deveria ser possível!");
   } catch (error) {
     console.log("Transação rejeitada como esperado:", 
-      error.message.includes("Excede limite") ? "Excede limite diário" : error.message);
+      error.message.includes("Excede limite") ? "Excede limite diario" : error.message);
   }
   
   // Transação usando o dispositivo de backup
@@ -183,20 +183,20 @@ async function main() {
   
   console.log(`Transação com dispositivo backup executada! Enviado ${ethers.utils.formatEther(backupValue)} ETH`);
   
-  // Verificar uso diário do dispositivo backup
+  // Verificar uso diario do dispositivo backup
   const backupUsage = await wallet.getDailyUsage(deviceId2);
-  console.log("Uso diário do smartphone backup:");
+  console.log("Uso diario do smartphone backup:");
   console.log("- Usado:", ethers.utils.formatEther(backupUsage.used), "ETH");
   console.log("- Limite:", ethers.utils.formatEther(backupUsage.limit), "ETH");
   console.log("- Restante:", ethers.utils.formatEther(backupUsage.remaining), "ETH");
   
-  // Simular uma transação manual (sem autenticação biométrica)
+  // Simular uma transação manual (sem Autenticacao biométrica)
   console.log("\n======= TRANSAÇÃO MANUAL (SEM BIOMETRIA) =======");
-  const manualValue = ethers.utils.parseEther("0.3"); // Valor acima do limite diário
+  const manualValue = ethers.utils.parseEther("0.3"); // Valor acima do limite diario
   
   console.log(`Executando transação manual de ${ethers.utils.formatEther(manualValue)} ETH (acima do limite)...`);
   
-  // Executar transação manual (sem verificação de limite diário)
+  // Executar transação manual (sem verificação de limite diario)
   await wallet.connect(owner).execute(
     recipient2.address,
     manualValue,
@@ -204,16 +204,16 @@ async function main() {
   );
   
   console.log(`Transação manual executada! Enviado ${ethers.utils.formatEther(manualValue)} ETH`);
-  console.log("Observe que transações manuais não possuem limite diário, mas exigem confirmação explícita do usuário");
+  console.log("Observe que transações manuais nao possuem limite diario, mas exigem confirmação explícita do usuário");
   
   // Resumo final
   console.log("\n=========================================");
-  console.log("DEMONSTRAÇÃO COMPLETA DE CARTEIRA COM AUTENTICAÇÃO BIOMÉTRICA");
+  console.log("DEMONSTRAÇÃO COMPLETA DE CARTEIRA COM Autenticacao BIOMÉTRICA");
   console.log("Recursos demonstrados:");
   console.log("1. Registro de múltiplos dispositivos biométricos");
-  console.log("2. Definição de limites diários por dispositivo");
+  console.log("2. Definição de limites diarios por dispositivo");
   console.log("3. Transações automáticas com verificação biométrica");
-  console.log("4. Controle de limites diários para transações biométricas");
+  console.log("4. Controle de limites diarios para transações biométricas");
   console.log("5. Transações manuais sem limite para casos excepcionais");
   
   // Saldo final

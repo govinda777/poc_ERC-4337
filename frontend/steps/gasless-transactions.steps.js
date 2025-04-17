@@ -8,7 +8,7 @@ Given('que estou conectado à minha carteira', async function() {
   expect(this.isConnected).to.be.true;
 });
 
-Given('minha carteira está patrocinada pelo SponsorPaymaster', async function() {
+Given('minha carteira esta patrocinada pelo SponsorPaymaster', async function() {
   this.isSponsored = await TransactionService.checkSponsorStatus();
   expect(this.isSponsored).to.be.true;
 });
@@ -30,7 +30,7 @@ Then('a transação deve ser processada sem custo de gas para mim', async functi
   const beforeBalance = this.initialBalance || '0';
   const afterBalance = await TransactionService.getBalance();
   
-  // Em transações patrocinadas, o saldo não deve diminuir devido ao gas
+  // Em transações patrocinadas, o saldo nao deve diminuir devido ao gas
   // Pode diminuir apenas pelo valor da transação
   const amountValue = parseFloat(this.transactionAmount || '0');
   const expectedBalance = parseFloat(beforeBalance) - amountValue;
@@ -44,7 +44,7 @@ Then('devo ver uma confirmação de transação bem-sucedida', async function() 
   const confirmationMessage = await this.getElement('#transaction-confirmation').getText();
   expect(confirmationMessage).to.contain('Transação enviada com sucesso');
   
-  // Verificar que o hash da transação está presente
+  // Verificar que o hash da transação esta presente
   const txHash = await this.getElement('#transaction-hash').getText();
   expect(txHash).to.match(/^0x[a-fA-F0-9]{64}$/);
 }); 

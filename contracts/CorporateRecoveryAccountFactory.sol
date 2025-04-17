@@ -21,7 +21,7 @@ contract CorporateRecoveryAccountFactory {
     /**
      * Cria uma nova carteira corporativa
      * @param initialSigners Lista inicial de signatários
-     * @param threshold Número mínimo de assinaturas necessárias
+     * @param threshold Número minimo de assinaturas necessárias
      * @param salt Um valor de salt para o cálculo do endereço
      * @return address O endereço da nova carteira
      */

@@ -5,18 +5,38 @@ import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "./DeFiInsuranceAccount.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
+/**
+ * Implementação concreta de DeFiInsuranceAccount
+ */
+contract DeFiInsuranceAccountImpl is DeFiInsuranceAccount {
+    using ECDSA for bytes32;
+    
+    constructor(IEntryPoint anEntryPoint) DeFiInsuranceAccount(anEntryPoint) {}
+    
+    // Implementação da função abstrata necessária
+    function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash)
+    internal override returns (uint256 validationData) {
+        bytes32 hash = userOpHash.toEthSignedMessageHash();
+        if (owner != hash.recover(userOp.signature)) {
+            return SIG_VALIDATION_FAILED;
+        }
+        return 0;
+    }
+}
 
 /**
  * @title DeFiInsuranceAccountFactory
  * @dev Factory for creating DeFi Insurance accounts
  */
 contract DeFiInsuranceAccountFactory {
-    DeFiInsuranceAccount public immutable accountImplementation;
+    address public immutable accountImplementation;
     
     event AccountCreated(address indexed account, address indexed owner, address indexed oracle);
     
     constructor(IEntryPoint entryPoint) {
-        accountImplementation = new DeFiInsuranceAccount(entryPoint);
+        accountImplementation = address(new DeFiInsuranceAccountImpl(entryPoint));
     }
     
     /**

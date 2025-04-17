@@ -81,7 +81,7 @@ const BatchTransaction = () => {
   // Estimar gas para as transações em lote
   const estimateTransactionGas = async () => {
     if (!hasSmartAccount || !smartAccountAddress) {
-      toast.error('Conta inteligente não encontrada');
+      toast.error('Conta inteligente nao encontrada');
       return;
     }
     
@@ -139,7 +139,7 @@ const BatchTransaction = () => {
   // Enviar transações em lote
   const sendBatchTransaction = async () => {
     if (!hasSmartAccount || !smartAccountAddress) {
-      toast.error('Conta inteligente não encontrada');
+      toast.error('Conta inteligente nao encontrada');
       return;
     }
     

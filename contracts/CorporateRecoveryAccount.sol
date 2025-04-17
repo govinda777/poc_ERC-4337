@@ -20,7 +20,7 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
 
     // Propriedades de gerenciamento de assinaturas
     EnumerableSet.AddressSet private _signers;
-    uint256 public signatureThreshold;  // Número mínimo de assinaturas necessárias
+    uint256 public signatureThreshold;  // Número minimo de assinaturas necessárias
     
     // Mecanismo de recuperação
     struct RecoveryRequest {
@@ -66,27 +66,27 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     
     // Modificadores
     modifier onlySigner() {
-        require(_signers.contains(msg.sender), "não é um signatário");
+        require(_signers.contains(msg.sender), "not a signer");
         _;
     }
     
     modifier onlySelf() {
-        require(msg.sender == address(this), "apenas a própria conta");
+        require(msg.sender == address(this), "only the account itself");
         _;
     }
     
     modifier txExists(uint256 txIndex) {
-        require(txIndex < transactionCount, "tx não existe");
+        require(txIndex < transactionCount, "tx does not exist");
         _;
     }
     
     modifier notExecuted(uint256 txIndex) {
-        require(!transactions[txIndex].executed, "tx já executada");
+        require(!transactions[txIndex].executed, "tx ja executada");
         _;
     }
     
     modifier notConfirmed(uint256 txIndex) {
-        require(!confirmations[txIndex][msg.sender], "tx já confirmada");
+        require(!confirmations[txIndex][msg.sender], "tx ja confirmada");
         _;
     }
 
@@ -105,19 +105,19 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     /**
      * Inicializa a conta corporativa com múltiplos signatários
      * @param initialSigners Lista inicial de signatários
-     * @param initialThreshold Número mínimo de assinaturas necessárias
+     * @param initialThreshold Número minimo de assinaturas necessárias
      */
     function initialize(
         address[] memory initialSigners,
         uint256 initialThreshold
     ) public virtual initializer {
-        require(initialSigners.length > 0, "pelo menos um signatário");
-        require(initialThreshold > 0 && initialThreshold <= initialSigners.length, "limite inválido");
+        require(initialSigners.length > 0, "pelo menos um signatario");
+        require(initialThreshold > 0 && initialThreshold <= initialSigners.length, "limite invalido");
         
         for (uint256 i = 0; i < initialSigners.length; i++) {
             address signer = initialSigners[i];
-            require(signer != address(0), "signatário não pode ser endereço zero");
-            require(!_signers.contains(signer), "signatários não podem ser duplicados");
+            require(signer != address(0), "signatario nao pode ser endereco zero");
+            require(!_signers.contains(signer), "signatarios nao podem ser duplicados");
             _signers.add(signer);
         }
         
@@ -146,7 +146,7 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
      * Verifica se a chamada vem do entryPoint ou do próprio contrato
      */
     function _requireFromEntryPointOrSelf() internal view {
-        require(msg.sender == address(entryPoint()) || msg.sender == address(this), "conta: não autorizado");
+        require(msg.sender == address(entryPoint()) || msg.sender == address(this), "conta: nao autorizado");
     }
 
     /**
@@ -179,7 +179,7 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
         onlySigner 
         returns (uint256 txIndex) 
     {
-        require(destination != address(0), "destino não pode ser endereço zero");
+        require(destination != address(0), "destino nao pode ser endereco zero");
         
         txIndex = transactionCount;
         
@@ -229,7 +229,7 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     {
         Transaction storage transaction = transactions[txIndex];
         
-        require(transaction.numConfirmations >= signatureThreshold, "confirmações insuficientes");
+        require(transaction.numConfirmations >= signatureThreshold, "confirmacoes insuficientes");
         
         transaction.executed = true;
         
@@ -255,7 +255,7 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
      */
     function executeBatch(address[] calldata dest, bytes[] calldata func) external {
         _requireFromEntryPointOrSelf();
-        require(dest.length == func.length, "tamanhos de arrays incompatíveis");
+        require(dest.length == func.length, "tamanhos de arrays incompativeis");
         
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
@@ -265,11 +265,11 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     // ----- Funções de gerenciamento da conta -----
     
     /**
-     * Adiciona um novo signatário (requer aprovação multisig)
+     * Adiciona um novo signatário (requer Aprovacao multisig)
      */
     function addSigner(address newSigner) external onlySelf {
-        require(newSigner != address(0), "signatário não pode ser endereço zero");
-        require(!_signers.contains(newSigner), "já é um signatário");
+        require(newSigner != address(0), "signatario nao pode ser endereco zero");
+        require(!_signers.contains(newSigner), "ja e um signatario");
         
         _signers.add(newSigner);
         
@@ -277,11 +277,11 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     }
     
     /**
-     * Remove um signatário existente (requer aprovação multisig)
+     * Remove um signatário existente (requer Aprovacao multisig)
      */
     function removeSigner(address signer) external onlySelf {
-        require(_signers.contains(signer), "não é um signatário");
-        require(_signers.length() > signatureThreshold, "não pode reduzir abaixo do limite");
+        require(_signers.contains(signer), "nao e um signatario");
+        require(_signers.length() > signatureThreshold, "nao pode reduzir abaixo do limite");
         
         _signers.remove(signer);
         
@@ -289,11 +289,11 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     }
     
     /**
-     * Altera o número mínimo de assinaturas (requer aprovação multisig)
+     * Altera o número minimo de assinaturas (requer Aprovacao multisig)
      */
     function changeThreshold(uint256 newThreshold) external onlySelf {
         require(newThreshold > 0, "limite deve ser positivo");
-        require(newThreshold <= _signers.length(), "limite não pode exceder número de signatários");
+        require(newThreshold <= _signers.length(), "limite nao pode exceder numero de signatarios");
         
         signatureThreshold = newThreshold;
         
@@ -305,15 +305,15 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
      * Implementação do recoverAccess() descrito no caso de uso
      */
     function initiateRecovery(address[] calldata newSigners) external onlySigner {
-        require(newSigners.length >= 3, "Mínimo 3 signatários");
+        require(newSigners.length >= 3, "Minimo 3 signatarios");
         
         // Validar os novos signatários
         for (uint256 i = 0; i < newSigners.length; i++) {
-            require(newSigners[i] != address(0), "signatário não pode ser endereço zero");
+            require(newSigners[i] != address(0), "signatario nao pode ser endereco zero");
             
             // Verificar duplicatas
             for (uint256 j = 0; j < i; j++) {
-                require(newSigners[i] != newSigners[j], "signatários duplicados");
+                require(newSigners[i] != newSigners[j], "signatarios duplicados");
             }
         }
         
@@ -332,9 +332,9 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
      * Aprova uma solicitação de recuperação (pelos signatários remanescentes)
      */
     function approveRecovery() external onlySigner {
-        require(recoveryRequest.requestTime > 0, "nenhuma solicitação pendente");
-        require(!recoveryRequest.approvals[msg.sender], "já aprovado");
-        require(!recoveryRequest.executed, "recuperação já executada");
+        require(recoveryRequest.requestTime > 0, "nenhuma solicitacao pendente");
+        require(!recoveryRequest.approvals[msg.sender], "ja aprovado");
+        require(!recoveryRequest.executed, "recuperacao ja executada");
         
         recoveryRequest.approvals[msg.sender] = true;
         recoveryRequest.approvalCount++;
@@ -347,8 +347,8 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
      * Esta é a implementação do recoverAccess() descrito no caso de uso
      */
     function recoverAccess() external onlySigner {
-        require(recoveryRequest.requestTime > 0, "nenhuma solicitação pendente");
-        require(!recoveryRequest.executed, "recuperação já executada");
+        require(recoveryRequest.requestTime > 0, "nenhuma solicitacao pendente");
+        require(!recoveryRequest.executed, "recuperacao ja executada");
         require(block.timestamp >= recoveryRequest.requestTime + recoveryRequest.recoveryCooldown, 
                 "Aguarde 7 dias");
         
@@ -380,11 +380,11 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     }
     
     /**
-     * Altera o período de espera padrão para recuperação (requer aprovação multisig)
+     * Altera o período de espera padrão para recuperação (requer Aprovacao multisig)
      */
     function changeRecoveryCooldown(uint256 newCooldown) external onlySelf {
-        require(newCooldown >= 1 days, "período mínimo de 1 dia");
-        require(newCooldown <= 30 days, "período máximo de 30 dias");
+        require(newCooldown >= 1 days, "periodo minimo de 1 dia");
+        require(newCooldown <= 30 days, "periodo maximo de 30 dias");
         
         defaultRecoveryCooldown = newCooldown;
         

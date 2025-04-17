@@ -14,9 +14,9 @@ When('o sistema verifica a compatibilidade do meu dispositivo', async function()
 Then('devo ver uma mensagem indicando se meu dispositivo suporta biometria', async function() {
   const message = await this.getElement('#compatibility-message').getText();
   if (this.isCompatible) {
-    expect(message).to.contain('Seu dispositivo suporta autenticação biométrica');
+    expect(message).to.contain('Seu dispositivo suporta Autenticacao biométrica');
   } else {
-    expect(message).to.contain('Seu dispositivo não suporta autenticação biométrica');
+    expect(message).to.contain('Seu dispositivo nao suporta Autenticacao biométrica');
   }
 });
 
@@ -57,7 +57,7 @@ When('eu tento acessar minha carteira', async function() {
   await this.clickElement('#login-button');
 });
 
-When('forneço minha autenticação biométrica', async function() {
+When('forneço minha Autenticacao biométrica', async function() {
   // Simula a verificação biométrica
   this.authResult = await BiometricService.authenticate();
   expect(this.authResult.success).to.be.true;

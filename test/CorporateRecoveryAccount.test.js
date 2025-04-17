@@ -137,7 +137,7 @@ describe("Recuperação de Carteira Corporativa", function () {
       // Verificar status da recuperação
       const status = await wallet.getRecoveryStatus();
       expect(status.approvalCount).to.equal(1);
-      expect(status.canExecute).to.be.false; // Não pode executar ainda (prazo de espera)
+      expect(status.canExecute).to.be.false; // nao pode executar ainda (prazo de espera)
     });
     
     it("Permite que outros signatários aprovem a recuperação", async function () {
@@ -213,16 +213,16 @@ describe("Recuperação de Carteira Corporativa", function () {
   });
   
   describe("Casos de falha no processo de recuperação", function () {
-    it("Bloqueia tentativas de iniciar recuperação por não-signatários", async function () {
+    it("Bloqueia tentativas de iniciar recuperação por nao-signatários", async function () {
       await expect(
         wallet.connect(signer2).initiateRecovery([signer1.address, signer3.address, signer5.address])
-      ).to.be.revertedWith("não é um signatário");
+      ).to.be.revertedWith("nao é um signatário");
     });
     
     it("Requer pelo menos 3 signatários na nova configuração", async function () {
       await expect(
         wallet.connect(signer1).initiateRecovery([signer1.address, signer3.address])
-      ).to.be.revertedWith("Mínimo 3 signatários");
+      ).to.be.revertedWith("minimo 3 signatários");
     });
     
     it("Rejeita signatários duplicados na nova configuração", async function () {

@@ -17,7 +17,7 @@ async function main() {
   try {
     addresses = JSON.parse(fs.readFileSync("addresses.json", "utf8"));
   } catch (error) {
-    console.error("Arquivo addresses.json não encontrado. Você precisa implantar os contratos primeiro.");
+    console.error("Arquivo addresses.json nao encontrado. Você precisa implantar os contratos primeiro.");
     process.exit(1);
   }
 
@@ -34,7 +34,7 @@ async function main() {
       break;
     case "add":
       if (args.length < 3) {
-        console.error("Endereço do dispositivo não especificado!");
+        console.error("Endereço do dispositivo nao especificado!");
         printUsage();
         process.exit(1);
       }
@@ -42,7 +42,7 @@ async function main() {
       break;
     case "remove":
       if (args.length < 3) {
-        console.error("Endereço do dispositivo não especificado!");
+        console.error("Endereço do dispositivo nao especificado!");
         printUsage();
         process.exit(1);
       }
@@ -50,7 +50,7 @@ async function main() {
       break;
     case "set-min":
       if (args.length < 3) {
-        console.error("Número mínimo de dispositivos não especificado!");
+        console.error("Número minimo de dispositivos nao especificado!");
         printUsage();
         process.exit(1);
       }
@@ -68,23 +68,23 @@ async function listDevices(biometricAccount) {
   const admin = await biometricAccount.admin();
   console.log(`Admin da conta: ${admin}`);
   
-  // Obtém o número de dispositivos e mínimo necessário
+  // Obtém o número de dispositivos e minimo necessário
   const deviceCount = await biometricAccount.deviceCount();
   const minDevices = await biometricAccount.minDevices();
   console.log(`Dispositivos ativos: ${deviceCount}`);
-  console.log(`Dispositivos mínimos necessários: ${minDevices}`);
+  console.log(`Dispositivos minimos necessários: ${minDevices}`);
   
-  // Não podemos listar diretamente porque o mapeamento não é iterável
-  // Podemos apenas verificar se um endereço específico está autorizado
-  console.log("\nPara verificar se um dispositivo está autorizado, use:");
+  // nao podemos listar diretamente porque o mapeamento nao é iterável
+  // Podemos apenas verificar se um endereço específico esta autorizado
+  console.log("\nPara verificar se um dispositivo esta autorizado, use:");
   console.log("npx hardhat run scripts/manageBiometricDevices.js -- check ACCOUNT_ADDRESS DEVICE_ADDRESS");
 }
 
 async function addDevice(biometricAccount, deviceAddress) {
-  // Verifica se o dispositivo já está autorizado
+  // Verifica se o dispositivo já esta autorizado
   const isAuthorized = await biometricAccount.authorizedDevices(deviceAddress);
   if (isAuthorized) {
-    console.log(`Dispositivo ${deviceAddress} já está autorizado!`);
+    console.log(`Dispositivo ${deviceAddress} já esta autorizado!`);
     return;
   }
   
@@ -97,17 +97,17 @@ async function addDevice(biometricAccount, deviceAddress) {
   // Verifica se foi adicionado corretamente
   const isNowAuthorized = await biometricAccount.authorizedDevices(deviceAddress);
   if (isNowAuthorized) {
-    console.log("Verificação confirmada: dispositivo está autorizado.");
+    console.log("Verificação confirmada: dispositivo esta autorizado.");
   } else {
-    console.error("Erro: o dispositivo não foi adicionado corretamente!");
+    console.error("Erro: o dispositivo nao foi adicionado corretamente!");
   }
 }
 
 async function removeDevice(biometricAccount, deviceAddress) {
-  // Verifica se o dispositivo está autorizado
+  // Verifica se o dispositivo esta autorizado
   const isAuthorized = await biometricAccount.authorizedDevices(deviceAddress);
   if (!isAuthorized) {
-    console.log(`Dispositivo ${deviceAddress} não está autorizado!`);
+    console.log(`Dispositivo ${deviceAddress} nao esta autorizado!`);
     return;
   }
   
@@ -121,19 +121,19 @@ async function removeDevice(biometricAccount, deviceAddress) {
     // Verifica se foi removido corretamente
     const isStillAuthorized = await biometricAccount.authorizedDevices(deviceAddress);
     if (!isStillAuthorized) {
-      console.log("Verificação confirmada: dispositivo não está mais autorizado.");
+      console.log("Verificação confirmada: dispositivo nao esta mais autorizado.");
     } else {
-      console.error("Erro: o dispositivo ainda está autorizado!");
+      console.error("Erro: o dispositivo ainda esta autorizado!");
     }
   } catch (error) {
     console.error("Erro ao remover dispositivo:", error.message);
     
-    // Verifica se o erro é devido ao mínimo de dispositivos
-    if (error.message.includes("mínimo de dispositivos necessário")) {
+    // Verifica se o erro é devido ao minimo de dispositivos
+    if (error.message.includes("minimo de dispositivos necessário")) {
       const deviceCount = await biometricAccount.deviceCount();
       const minDevices = await biometricAccount.minDevices();
-      console.log(`Você tem ${deviceCount} dispositivo(s) e o mínimo necessário é ${minDevices}.`);
-      console.log("Reduza o mínimo necessário antes de remover dispositivos.");
+      console.log(`Você tem ${deviceCount} dispositivo(s) e o minimo necessário é ${minDevices}.`);
+      console.log("Reduza o minimo necessário antes de remover dispositivos.");
     }
   }
 }
@@ -144,26 +144,26 @@ async function setMinDevices(biometricAccount, newMinDevices) {
     const deviceCount = await biometricAccount.deviceCount();
     
     if (newMinDevices <= 0) {
-      console.error("O mínimo de dispositivos deve ser maior que zero!");
+      console.error("O minimo de dispositivos deve ser maior que zero!");
       return;
     }
     
     if (newMinDevices > deviceCount) {
-      console.error(`O mínimo de dispositivos (${newMinDevices}) não pode ser maior que o total (${deviceCount})!`);
+      console.error(`O minimo de dispositivos (${newMinDevices}) nao pode ser maior que o total (${deviceCount})!`);
       return;
     }
     
-    // Atualiza o mínimo de dispositivos
-    console.log(`Atualizando mínimo de dispositivos para ${newMinDevices}...`);
+    // Atualiza o minimo de dispositivos
+    console.log(`Atualizando minimo de dispositivos para ${newMinDevices}...`);
     const tx = await biometricAccount.updateMinDevices(newMinDevices);
     await tx.wait();
-    console.log("Mínimo de dispositivos atualizado com sucesso!");
+    console.log("minimo de dispositivos atualizado com sucesso!");
     
     // Verifica se foi atualizado corretamente
     const minDevices = await biometricAccount.minDevices();
-    console.log(`Novo mínimo de dispositivos: ${minDevices}`);
+    console.log(`Novo minimo de dispositivos: ${minDevices}`);
   } catch (error) {
-    console.error("Erro ao atualizar mínimo de dispositivos:", error.message);
+    console.error("Erro ao atualizar minimo de dispositivos:", error.message);
   }
 }
 
@@ -175,7 +175,7 @@ Comandos:
   list                  Lista informações sobre os dispositivos da conta
   add <device>          Adiciona um novo dispositivo à conta
   remove <device>       Remove um dispositivo da conta
-  set-min <number>      Define o número mínimo de dispositivos necessários
+  set-min <number>      Define o número minimo de dispositivos necessários
 
 Exemplos:
   npx hardhat run scripts/manageBiometricDevices.js -- list 0x1234...

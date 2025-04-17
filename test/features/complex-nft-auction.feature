@@ -47,7 +47,7 @@ Feature: Complex NFT Auction with Governance Tokens
     And Bob is the highest bidder with 0.15 ETH and 150 tokens
     And Dave has 0.05 ETH and 200 governance tokens
     When Dave attempts to place a bid with 0.05 ETH and 180 tokens
-    Then the bid should be rejected with message "Lance em ETH abaixo do preço mínimo"
+    Then the bid should be rejected with message "Lance em ETH abaixo do preco minimo"
     And Bob should remain the highest bidder
 
   Scenario: Attempting to place a bid with insufficient tokens

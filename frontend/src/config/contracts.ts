@@ -62,7 +62,7 @@ export const ERC4337_CONTRACTS = {
       case 5: // Goerli
         return ERC4337_CONTRACTS.goerli;
       default:
-        throw new Error(`Chain ID ${chainId} não suportado para ERC-4337`);
+        throw new Error(`Chain ID ${chainId} nao suportado para ERC-4337`);
     }
   }
 };
@@ -75,7 +75,7 @@ export enum AccountType {
   CORPORATE_RECOVERY = 'corporateRecovery'
 }
 
-// ABI mínimo para o EntryPoint
+// ABI minimo para o EntryPoint
 export const ENTRY_POINT_ABI_MINIMAL = [
   'function getNonce(address sender, uint192 key) view returns (uint256)',
   'function depositTo(address account) payable',

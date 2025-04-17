@@ -32,14 +32,14 @@ const DeFiInsurance = () => {
   const [lastPriceCheck, setLastPriceCheck] = useState<string>('');
   const [rescueDestination, setRescueDestination] = useState<string>('');
 
-  // Simular obtenção do preço do ETH de um oráculo
+  // Simular obtenção do preco do ETH de um oráculo
   useEffect(() => {
     const getEthPrice = async () => {
-      // Em uma implementação real, buscaria o preço de um oráculo Chainlink
+      // Em uma implementação real, buscaria o preco de um oráculo Chainlink
       const mockPrice = 2000 + Math.random() * 200;
       setEthPrice(mockPrice);
       
-      // Triggar price é 20% abaixo do preço atual
+      // Triggar price é 20% abaixo do preco atual
       setTriggerPrice(mockPrice * 0.8);
     };
     
@@ -181,7 +181,7 @@ const DeFiInsurance = () => {
       if (canLiquidate) {
         toast.warning("Condições de liquidação atingidas! A conta pode ser liquidada.");
       } else {
-        toast.info("Condições de liquidação não atingidas. Seus fundos estão seguros.");
+        toast.info("Condições de liquidação nao atingidas. Seus fundos estão seguros.");
       }
     } catch (error) {
       console.error("Erro ao verificar liquidação:", error);
@@ -198,15 +198,15 @@ const DeFiInsurance = () => {
       <InfoBanner
         type="info"
         title="Sobre o Seguro DeFi"
-        message="Proteja seus investimentos contra quedas abruptas de preço. Seu ETH será automaticamente liquidado e enviado para um endereço seguro se o preço cair 20% em 24h."
+        message="Proteja seus investimentos contra quedas abruptas de preco. Seu ETH será automaticamente liquidado e enviado para um endereço seguro se o preco cair 20% em 24h."
       />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        {/* Preços e métricas */}
-        <Card title="Preços e Limites">
+        {/* precos e métricas */}
+        <Card title="precos e Limites">
           <div className="space-y-4">
             <PriceDisplay
-              label="Preço ETH Atual"
+              label="preco ETH Atual"
               value={ethPrice.toFixed(2)}
               currency="USD"
               change={+1.2}
@@ -214,7 +214,7 @@ const DeFiInsurance = () => {
             />
             
             <PriceDisplay
-              label="Preço de Liquidação (Trigger)"
+              label="preco de Liquidação (Trigger)"
               value={triggerPrice.toFixed(2)}
               currency="USD"
               isAlert={true}
@@ -315,7 +315,7 @@ const DeFiInsurance = () => {
             
             <div>
               <div className="mb-2 text-sm text-gray-600">
-                Liquidação manual só deve ser usada em emergências. O sistema detectará quedas de preço automaticamente.
+                Liquidação manual só deve ser usada em emergências. O sistema detectará quedas de preco automaticamente.
               </div>
               
               <Button
@@ -338,7 +338,7 @@ const DeFiInsurance = () => {
             <h3 className="text-lg font-medium text-red-800">Conta Liquidada</h3>
             <div className="mt-2 text-sm text-red-700">
               <p>Sua conta foi liquidada em {new Date().toLocaleString()}</p>
-              <p className="mt-1">Preço de disparo: ${triggerPrice.toFixed(2)} USD</p>
+              <p className="mt-1">preco de disparo: ${triggerPrice.toFixed(2)} USD</p>
               <p className="mt-1">Fundos resgatados: {accountBalance} ETH</p>
               <p className="mt-1">Enviados para: {rescueDestination || account}</p>
             </div>

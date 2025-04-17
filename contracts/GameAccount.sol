@@ -13,15 +13,12 @@ import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 /**
  * Conta de jogador para o "CryptoQuest"
- * Permite autenticação via login social (Google/Apple ID)
+ * Permite Autenticacao via login social (Google/Apple ID)
  * Permite transações sem gas para novos jogadores
  */
-contract GameAccount is BaseAccount, Initializable, UUPSUpgradeable, IERC721Receiver {
+abstract contract GameAccount is BaseAccount, Initializable, UUPSUpgradeable, IERC721Receiver {
     using ECDSA for bytes32;
 
-    // Storage slot with the address of the current implementation
-    bytes32 internal constant _IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;
-    
     // Social auth identifier (hash of user's social credentials)
     bytes32 public socialAuthId;
     
@@ -261,4 +258,18 @@ contract GameAccount is BaseAccount, Initializable, UUPSUpgradeable, IERC721Rece
      * Receive ETH
      */
     receive() external payable {}
+}
+
+/**
+ * Implementação concreta de GameAccount para uso pela factory
+ */
+contract GameAccountImpl is GameAccount {
+    constructor(IEntryPoint anEntryPoint) GameAccount(anEntryPoint) {}
+    
+    // Implementação das funções abstratas necessárias
+    function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash)
+    internal virtual override returns (uint256 validationData) {
+        // Implemented in validateUserOp, so this is not used
+        return 0;
+    }
 } 

@@ -140,7 +140,7 @@ describe("CorporateRecoveryAccountFactory", function () {
       
       await expect(
         factory.createAccount(duplicatedSigners, threshold, salt)
-      ).to.be.revertedWith("signatários não podem ser duplicados");
+      ).to.be.revertedWith("signatários nao podem ser duplicados");
     });
   });
 }); 

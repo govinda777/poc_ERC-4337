@@ -28,7 +28,7 @@ contract NFTAuction is ReentrancyGuard, Ownable {
     // Token de governança usado para lances
     IERC20 public governanceToken;
     
-    // ID do leilão => Estrutura do leilão
+    // ID do Leilao => Estrutura do Leilao
     mapping(uint256 => Auction) public auctions;
     
     // Contador de leilões
@@ -45,18 +45,19 @@ contract NFTAuction is ReentrancyGuard, Ownable {
     event NFTClaimed(uint256 auctionId, address winner);
     event FundsClaimed(uint256 auctionId, address seller, uint256 ethAmount, uint256 tokenAmount);
 
-    constructor(address _governanceToken, address initialOwner) Ownable(initialOwner) {
+    constructor(address _governanceToken, address initialOwner) {
         governanceToken = IERC20(_governanceToken);
+        _transferOwnership(initialOwner);
     }
 
     /**
-     * @dev Cria um novo leilão
+     * @dev Cria um novo Leilao
      * @param nftContract Endereço do contrato NFT
      * @param tokenId ID do token a ser leiloado
-     * @param minEthAmount Valor mínimo em ETH para o lance inicial
-     * @param minTokenAmount Valor mínimo em tokens de governança para o lance inicial
-     * @param duration Duração do leilão em segundos
-     * @return auctionId ID do leilão criado
+     * @param minEthAmount Valor minimo em ETH para o lance inicial
+     * @param minTokenAmount Valor minimo em tokens de governança para o lance inicial
+     * @param duration Duração do Leilao em segundos
+     * @return auctionId ID do Leilao criado
      */
     function createAuction(
         address nftContract,
@@ -93,7 +94,7 @@ contract NFTAuction is ReentrancyGuard, Ownable {
 
     /**
      * @dev Permite um usuário fazer um lance com ETH + tokens
-     * @param auctionId ID do leilão
+     * @param auctionId ID do Leilao
      * @param tokenAmount Quantidade de tokens de governança incluídos no lance
      */
     function placeBid(uint256 auctionId, uint256 tokenAmount) external payable nonReentrant {
@@ -135,8 +136,8 @@ contract NFTAuction is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @dev Encerra um leilão após o tempo expirar
-     * @param auctionId ID do leilão a ser encerrado
+     * @dev Encerra um Leilao após o tempo expirar
+     * @param auctionId ID do Leilao a ser encerrado
      */
     function endAuction(uint256 auctionId) external nonReentrant {
         Auction storage auction = auctions[auctionId];
@@ -150,8 +151,8 @@ contract NFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * @dev Permite o vencedor reivindicar o NFT após o fim do leilão
-     * @param auctionId ID do leilão
+     * @dev Permite o vencedor reivindicar o NFT após o fim do Leilao
+     * @param auctionId ID do Leilao
      */
     function claimNFT(uint256 auctionId) external nonReentrant {
         Auction storage auction = auctions[auctionId];
@@ -169,8 +170,8 @@ contract NFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * @dev Permite o vendedor reivindicar os fundos após o fim do leilão
-     * @param auctionId ID do leilão
+     * @dev Permite o vendedor reivindicar os fundos após o fim do Leilao
+     * @param auctionId ID do Leilao
      */
     function claimFunds(uint256 auctionId) external nonReentrant {
         Auction storage auction = auctions[auctionId];
@@ -196,8 +197,8 @@ contract NFTAuction is ReentrancyGuard, Ownable {
     }
     
     /**
-     * @dev Cancela um leilão (apenas vendedor ou sem lances)
-     * @param auctionId ID do leilão
+     * @dev Cancela um Leilao (apenas vendedor ou sem lances)
+     * @param auctionId ID do Leilao
      */
     function cancelAuction(uint256 auctionId) external nonReentrant {
         Auction storage auction = auctions[auctionId];

@@ -157,7 +157,7 @@ Este menu serve como guia estruturado para implementação completa da especific
 
 **Implementação**:
 - Contrato base `BaseAccount.sol`
-- `SocialLoginAccount.sol` - autenticação via OAuth
+- `SocialLoginAccount.sol` - Autenticacao via OAuth
 - `MultiSigAccount.sol` - autorização multi-assinatura
 - `AutomatedAccount.sol` - automações e triggers
 - `DeFiInsuranceAccount.sol` - liquidação automática
@@ -188,10 +188,10 @@ Este menu serve como guia estruturado para implementação completa da especific
 
 ### 4.1. Carteira com Login Social
 
-**Objetivo**: Implementar carteira com autenticação social completa.
+**Objetivo**: Implementar carteira com Autenticacao social completa.
 
 **Implementação**:
-- Backend de autenticação OAuth (Google, Apple)
+- Backend de Autenticacao OAuth (Google, Apple)
 - Conversão de JWT para assinaturas válidas
 - Frontend Web3 com interface de login simplificada
 - Deployment de conta determinística com recovery social
@@ -201,7 +201,7 @@ Este menu serve como guia estruturado para implementação completa da especific
 **Objetivo**: Implementar sistema de seguro com liquidação automática.
 
 **Implementação**:
-- Conta inteligente com monitoramento de preço
+- Conta inteligente com monitoramento de preco
 - Integração com oráculos Chainlink
 - Sistema de resgate automatizado
 - Serviço externo de monitoramento e alerta
@@ -257,7 +257,7 @@ Este menu serve como guia estruturado para implementação completa da especific
 **Implementação**:
 - API JSON-RPC compatível com ERC-4337
 - Métodos `eth_sendUserOperation` e `eth_estimateUserOperationGas`
-- Autenticação e rate-limiting
+- Autenticacao e rate-limiting
 - Documentação Swagger/OpenAPI
 
 ### 5.4. Monitoramento e Métricas
@@ -280,7 +280,7 @@ Este menu serve como guia estruturado para implementação completa da especific
 
 **Implementação**:
 - Componentes React para interação com contratos
-- Autenticação Social/Web3
+- Autenticacao Social/Web3
 - Interface de gerenciamento de carteira
 - Visualização de transações e histórico
 
@@ -353,7 +353,7 @@ Este menu serve como guia estruturado para implementação completa da especific
 **Objetivo**: Verificar segurança da implementação.
 
 **Implementação**:
-- Análise estática de código com ferramentas automatizadas
+- Análise estatica de código com ferramentas automatizadas
 - Verificação manual de vulnerabilidades
 - Auditoria completa por especialistas
 - Relatório de segurança documentado
@@ -362,10 +362,10 @@ Este menu serve como guia estruturado para implementação completa da especific
 
 ## Correlação entre Classes do Projeto e Itens de Menu
 
-Abaixo está a correlação entre os itens do [MENU.md][1] do projeto e as principais classes/arquivos presentes no repositório [govinda777/poc_ERC-4337](https://github.com/govinda777/poc_ERC-4337). Cada item do menu é relacionado aos contratos, scripts ou componentes de código que implementam ou representam aquela funcionalidade.
+Abaixo esta a correlação entre os itens do [MENU.md][1] do projeto e as principais classes/arquivos presentes no repositório [govinda777/poc_ERC-4337](https://github.com/govinda777/poc_ERC-4337). Cada item do menu é relacionado aos contratos, scripts ou componentes de código que implementam ou representam aquela funcionalidade.
 
 ### 1. Fundamentos ERC-4337
-- **1.1 a 1.4**: São tópicos conceituais e de documentação. Não correspondem diretamente a classes, mas são suportados por arquivos de documentação e diagramas presentes na pasta `/docs` ou README.
+- **1.1 a 1.4**: São tópicos conceituais e de documentação. nao correspondem diretamente a classes, mas são suportados por arquivos de documentação e diagramas presentes na pasta `/docs` ou README.
 
 ### 2. Config
 - **2.1. Ambiente de Desenvolvimento**:  
@@ -415,7 +415,7 @@ Abaixo está a correlação entre os itens do [MENU.md][1] do projeto e as princ
 | 7.1. Testes Unitários              | `test/` (testes para contratos e scripts)      |
 | 7.2. Testes de Integração          | `test/integration/`, scripts E2E               |
 | 7.3. Testes de Estresse            | `test/stress/`, scripts de carga               |
-| 7.4. Auditoria de Segurança        | Ferramentas de análise estática, scripts de auditoria |
+| 7.4. Auditoria de Segurança        | Ferramentas de análise estatica, scripts de auditoria |
 
 ---
 

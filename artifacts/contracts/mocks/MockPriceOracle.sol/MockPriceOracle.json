@@ -1,0 +1,146 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "MockPriceOracle",
+  "sourceName": "contracts/mocks/MockPriceOracle.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "PriceUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "fetchETHPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "valid",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLatestPriceData",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "valid",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lastUpdateTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "latestPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "priceValidity",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_price",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "_valid",
+          "type": "bool"
+        }
+      ],
+      "name": "updatePrice",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60806040526002805460ff1916600117905534801561001d57600080fd5b50600280546101003302610100600160a81b0319909116179055686c6b935b8bbd4000006000554260015561027a806100576000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146100dc5780639e40ee5d1461010c578063a3e6ba941461012a578063f0cde0fa1461013357600080fd5b806314bcec9f14610082578063242ef16e1461009e5780635abd0f64146100b3575b600080fd5b61008b60015481565b6040519081526020015b60405180910390f35b6100b16100ac36600461020f565b610150565b005b60005460015460025460ff16604080519384526020840192909252151590820152606001610095565b6002546100f49061010090046001600160a01b031681565b6040516001600160a01b039091168152602001610095565b60005460025460ff1660408051928352901515602083015201610095565b61008b60005481565b6002546101409060ff1681565b6040519015158152602001610095565b60025461010090046001600160a01b031633146101bd5760405162461bcd60e51b815260206004820152602160248201527f4f6e6c79206f776e65722063616e2063616c6c20746869732066756e6374696f6044820152603760f91b606482015260840160405180910390fd5b60008290556002805460ff191682151517905542600181905560405190815282907f945c1c4e99aa89f648fbfe3df471b916f719e16d960fcec0737d4d56bd6968389060200160405180910390a25050565b6000806040838503121561022257600080fd5b823591506020830135801515811461023957600080fd5b80915050925092905056fea26469706673582212200463c2cae19ed581b1cc4c56354bb08796d47db467e0685a81d0581f371aeb9f64736f6c63430008110033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c80638da5cb5b1161005b5780638da5cb5b146100dc5780639e40ee5d1461010c578063a3e6ba941461012a578063f0cde0fa1461013357600080fd5b806314bcec9f14610082578063242ef16e1461009e5780635abd0f64146100b3575b600080fd5b61008b60015481565b6040519081526020015b60405180910390f35b6100b16100ac36600461020f565b610150565b005b60005460015460025460ff16604080519384526020840192909252151590820152606001610095565b6002546100f49061010090046001600160a01b031681565b6040516001600160a01b039091168152602001610095565b60005460025460ff1660408051928352901515602083015201610095565b61008b60005481565b6002546101409060ff1681565b6040519015158152602001610095565b60025461010090046001600160a01b031633146101bd5760405162461bcd60e51b815260206004820152602160248201527f4f6e6c79206f776e65722063616e2063616c6c20746869732066756e6374696f6044820152603760f91b606482015260840160405180910390fd5b60008290556002805460ff191682151517905542600181905560405190815282907f945c1c4e99aa89f648fbfe3df471b916f719e16d960fcec0737d4d56bd6968389060200160405180910390a25050565b6000806040838503121561022257600080fd5b823591506020830135801515811461023957600080fd5b80915050925092905056fea26469706673582212200463c2cae19ed581b1cc4c56354bb08796d47db467e0685a81d0581f371aeb9f64736f6c63430008110033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

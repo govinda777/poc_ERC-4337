@@ -5,9 +5,9 @@ Feature: Carteira MultiSig
 
   Scenario: Criação de carteira MultiSig
     Given que estou na página de criação de carteira MultiSig
-    When eu adiciono "3" proprietários
+    When eu adiciono "3" proprietarios
     And defino o threshold como "2"
-    And defino o limite diário como "1" ETH
+    And defino o limite diario como "1" ETH
     And defino o limite por transação como "0.5" ETH
     And clico em "Criar Carteira MultiSig"
     Then a carteira MultiSig deve ser criada com sucesso

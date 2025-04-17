@@ -17,7 +17,7 @@ Interface web para interação com a implementação do ERC-4337, permitindo dem
 
 ```
 frontend/
-├── public/            # Arquivos estáticos
+├── public/            # Arquivos estaticos
 ├── src/
 │   ├── assets/        # Imagens, ícones, etc.
 │   ├── components/    # Componentes reutilizáveis

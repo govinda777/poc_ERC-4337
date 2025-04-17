@@ -5,7 +5,7 @@ Feature: Transações Sem Custos de Gas
 
   Scenario: Envio de transação patrocinada
     Given que estou conectado à minha carteira
-    And minha carteira está patrocinada pelo SponsorPaymaster
+    And minha carteira esta patrocinada pelo SponsorPaymaster
     When eu preencho o endereço do destinatário "0xRecipient"
     And preencho o valor de "0.01" ETH
     And clico em "Enviar Transação"

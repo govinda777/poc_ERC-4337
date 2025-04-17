@@ -7,7 +7,7 @@ import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "./BiometricAuthAccount.sol";
 
 /**
- * Fábrica para implantação de carteiras com autenticação biométrica para pagamentos diários.
+ * Fábrica para implantação de carteiras com Autenticacao biométrica para pagamentos diarios.
  */
 contract BiometricAuthAccountFactory {
     BiometricAuthAccount public immutable accountImplementation;
@@ -19,8 +19,8 @@ contract BiometricAuthAccountFactory {
     }
     
     /**
-     * Cria uma nova carteira com autenticação biométrica
-     * @param owner Proprietário da carteira
+     * Cria uma nova carteira com Autenticacao biométrica
+     * @param owner proprietario da carteira
      * @param salt Um valor de salt para o cálculo do endereço
      * @return address O endereço da nova carteira
      */

@@ -14,7 +14,7 @@ import "./mocks/MockPriceOracle.sol";
  * @dev ERC-4337 account with DeFi insurance and automatic rescue functionality
  * Monitors ETH price via oracle and liquidates position if price drops by a certain percentage
  */
-contract DeFiInsuranceAccount is BaseAccount, Initializable, UUPSUpgradeable {
+abstract contract DeFiInsuranceAccount is BaseAccount, Initializable, UUPSUpgradeable {
     using ECDSA for bytes32;
 
     // The EntryPoint singleton we trust

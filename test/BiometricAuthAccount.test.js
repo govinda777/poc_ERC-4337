@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("Assinaturas Biométricas para Pagamentos Diários", function () {
+describe("Assinaturas Biométricas para Pagamentos diarios", function () {
   let entryPoint;
   let factory;
   let wallet;
@@ -65,7 +65,7 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
       expect(await wallet.owner()).to.equal(owner.address);
     });
     
-    it("Permite registrar dispositivos com limites diários", async function () {
+    it("Permite registrar dispositivos com limites diarios", async function () {
       await wallet.connect(owner).registerDevice(deviceId1, "Smartphone Principal", DAILY_LIMIT);
       await wallet.connect(owner).registerDevice(deviceId2, "Smartphone Backup", ethers.utils.parseEther("0.05"));
       
@@ -108,12 +108,12 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
       const recipientBalanceAfter = await ethers.provider.getBalance(recipient.address);
       expect(recipientBalanceAfter.sub(recipientBalanceBefore)).to.equal(value);
       
-      // Verificar atualização do uso diário
+      // Verificar atualização do uso diario
       const usage = await wallet.getDailyUsage(deviceId1);
       expect(usage.used).to.equal(value);
     });
     
-    it("Acumula uso diário corretamente", async function () {
+    it("Acumula uso diario corretamente", async function () {
       const value = ethers.utils.parseEther("0.05");
       const recipientBalanceBefore = await ethers.provider.getBalance(recipient.address);
       
@@ -133,12 +133,12 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
       const recipientBalanceAfter = await ethers.provider.getBalance(recipient.address);
       expect(recipientBalanceAfter.sub(recipientBalanceBefore)).to.equal(value);
       
-      // Verificar atualização do uso diário (agora deve ser 0.1 ETH)
+      // Verificar atualização do uso diario (agora deve ser 0.1 ETH)
       const usage = await wallet.getDailyUsage(deviceId1);
       expect(usage.used).to.equal(ethers.utils.parseEther("0.1"));
     });
     
-    it("Bloqueia transações que excedem o limite diário", async function () {
+    it("Bloqueia transações que excedem o limite diario", async function () {
       const value = ethers.utils.parseEther("0.06"); // Isso excederia o limite de 0.15 ETH
       
       // Criar assinatura biométrica simulada
@@ -176,16 +176,16 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
       const recipientBalanceAfter = await ethers.provider.getBalance(recipient.address);
       expect(recipientBalanceAfter.sub(recipientBalanceBefore)).to.equal(value);
       
-      // Verificar atualização do uso diário do segundo dispositivo
+      // Verificar atualização do uso diario do segundo dispositivo
       const usage = await wallet.getDailyUsage(deviceId2);
       expect(usage.used).to.equal(value);
     });
     
-    it("Reinicia o contador diário após 24 horas", async function () {
+    it("Reinicia o contador diario após 24 horas", async function () {
       // Avançar o tempo em 25 horas
       await time.increase(25 * 60 * 60);
       
-      // Verificar se o uso diário foi reiniciado
+      // Verificar se o uso diario foi reiniciado
       const usage = await wallet.getDailyUsage(deviceId1);
       expect(usage.used).to.equal(0);
       
@@ -207,9 +207,9 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
     });
   });
   
-  describe("Transações manuais (sem limite diário)", function () {
-    it("Permite transações manuais acima do limite diário", async function () {
-      const value = ethers.utils.parseEther("0.3"); // Valor acima do limite diário
+  describe("Transações manuais (sem limite diario)", function () {
+    it("Permite transações manuais acima do limite diario", async function () {
+      const value = ethers.utils.parseEther("0.3"); // Valor acima do limite diario
       const recipientBalanceBefore = await ethers.provider.getBalance(recipient.address);
       
       // Executar transação manual
@@ -247,10 +247,10 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
           "0x",
           biometricSignature
         )
-      ).to.be.revertedWith("dispositivo inativo ou não registrado");
+      ).to.be.revertedWith("dispositivo inativo ou nao registrado");
     });
     
-    it("Permite alterar o limite diário de um dispositivo", async function () {
+    it("Permite alterar o limite diario de um dispositivo", async function () {
       const newLimit = ethers.utils.parseEther("0.2");
       await wallet.connect(owner).setDailyLimit(deviceId1, newLimit);
       
@@ -260,15 +260,15 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
   });
   
   describe("Segurança e restrições", function () {
-    it("Bloqueia registro de dispositivos por não proprietários", async function () {
+    it("Bloqueia registro de dispositivos por nao proprietarios", async function () {
       const newDeviceId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("unauthorized-device"));
       
       await expect(
-        wallet.connect(recipient).registerDevice(newDeviceId, "Dispositivo Não Autorizado", DAILY_LIMIT)
-      ).to.be.revertedWith("não é o proprietário");
+        wallet.connect(recipient).registerDevice(newDeviceId, "Dispositivo nao Autorizado", DAILY_LIMIT)
+      ).to.be.revertedWith("nao é o proprietario");
     });
     
-    it("Bloqueia transações biométricas por não proprietários", async function () {
+    it("Bloqueia transações biométricas por nao proprietarios", async function () {
       const value = ethers.utils.parseEther("0.01");
       const biometricSignature = await createBiometricSignature(deviceId1, owner);
       
@@ -280,7 +280,7 @@ describe("Assinaturas Biométricas para Pagamentos Diários", function () {
           "0x",
           biometricSignature
         )
-      ).to.be.revertedWith("não autorizado");
+      ).to.be.revertedWith("nao autorizado");
     });
   });
 }); 

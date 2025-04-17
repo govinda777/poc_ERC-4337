@@ -23,7 +23,7 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     // Estrutura de dados para guardiões (contatos confiáveis)
     mapping(address => bool) public guardians;
     uint256 public guardiansCount;
-    uint256 public recoveryThreshold; // Número mínimo de guardiões para recuperação
+    uint256 public recoveryThreshold; // Número minimo de guardiões para recuperação
     
     // Estrutura para solicitação de recuperação
     struct RecoveryRequest {
@@ -48,12 +48,12 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     event RecoveryDelayChanged(uint256 newDelay);
 
     modifier onlyOwner() {
-        require(msg.sender == owner || msg.sender == address(this), "não é o proprietário");
+        require(msg.sender == owner || msg.sender == address(this), "not owner");
         _;
     }
     
     modifier onlyGuardian() {
-        require(guardians[msg.sender], "não é um guardião");
+        require(guardians[msg.sender], "not a guardian");
         _;
     }
 
@@ -70,7 +70,7 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Inicializa a conta para um proprietário
+     * Inicializa a conta para um proprietario
      */
     function initialize(address anOwner) public virtual initializer {
         owner = anOwner;
@@ -90,10 +90,10 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
 
     /**
-     * Verifica se a chamada vem do entryPoint ou do proprietário
+     * Verifica se a chamada vem do entryPoint ou do proprietario
      */
     function _requireFromEntryPointOrOwner() internal view {
-        require(msg.sender == address(entryPoint()) || msg.sender == owner, "conta: não autorizado");
+        require(msg.sender == address(entryPoint()) || msg.sender == owner, "account: not authorized");
     }
 
     /**
@@ -128,7 +128,7 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
      */
     function executeBatch(address[] calldata dest, bytes[] calldata func) external {
         _requireFromEntryPointOrOwner();
-        require(dest.length == func.length, "tamanhos de arrays incompatíveis");
+        require(dest.length == func.length, unicode"tamanhos de arrays incompativeis");
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
         }
@@ -137,11 +137,11 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     // ----- Funções de Recuperação Social -----
 
     /**
-     * Adiciona um guardião (apenas o proprietário)
+     * Adiciona um guardião (apenas o proprietario)
      */
     function addGuardian(address guardian) external onlyOwner {
-        require(guardian != address(0), "endereço zero não permitido");
-        require(!guardians[guardian], "já é um guardião");
+        require(guardian != address(0), unicode"endereço zero nao permitido");
+        require(!guardians[guardian], unicode"já é um guardião");
         
         guardians[guardian] = true;
         guardiansCount++;
@@ -150,11 +150,11 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Remove um guardião (apenas o proprietário)
+     * Remove um guardião (apenas o proprietario)
      */
     function removeGuardian(address guardian) external onlyOwner {
-        require(guardians[guardian], "não é um guardião");
-        require(guardiansCount > recoveryThreshold, "não pode reduzir abaixo do limite");
+        require(guardians[guardian], unicode"nao é um guardião");
+        require(guardiansCount > recoveryThreshold, unicode"nao pode reduzir abaixo do limite");
         
         guardians[guardian] = false;
         guardiansCount--;
@@ -163,10 +163,10 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Configura o limite mínimo de guardiões para recuperação
+     * Configura o limite minimo de guardiões para recuperação
      */
     function setRecoveryThreshold(uint256 threshold) external onlyOwner {
-        require(threshold > 0 && threshold <= guardiansCount, "limite inválido");
+        require(threshold > 0 && threshold <= guardiansCount, unicode"limite inválido");
         recoveryThreshold = threshold;
         
         emit RecoveryThresholdChanged(threshold);
@@ -176,7 +176,7 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Configura o período de espera para recuperação
      */
     function setRecoveryDelay(uint256 delay) external onlyOwner {
-        require(delay <= 30 days, "atraso máximo de 30 dias");
+        require(delay <= 30 days, unicode"atraso máximo de 30 dias");
         recoveryDelay = delay;
         
         emit RecoveryDelayChanged(delay);
@@ -186,7 +186,7 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Inicia uma solicitação de recuperação (apenas guardiões)
      */
     function initiateRecovery(address newOwner) external onlyGuardian {
-        require(newOwner != address(0), "novo dono não pode ser endereço zero");
+        require(newOwner != address(0), unicode"novo dono nao pode ser endereço zero");
         
         // Reinicia solicitação anterior se houver
         delete recoveryRequest.approvals[msg.sender];
@@ -205,9 +205,9 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Aprova uma solicitação de recuperação existente (apenas guardiões)
      */
     function approveRecovery() external onlyGuardian {
-        require(recoveryRequest.timestamp > 0, "nenhuma solicitação pendente");
-        require(!recoveryRequest.approvals[msg.sender], "já aprovado");
-        require(!recoveryRequest.executed, "recuperação já executada");
+        require(recoveryRequest.timestamp > 0, unicode"nenhuma solicitação pendente");
+        require(!recoveryRequest.approvals[msg.sender], unicode"já aprovado");
+        require(!recoveryRequest.executed, unicode"recuperação já executada");
         
         recoveryRequest.approvals[msg.sender] = true;
         recoveryRequest.approvalCount++;
@@ -219,10 +219,10 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
      * Executa a recuperação após período de espera (qualquer guardião)
      */
     function executeRecovery() external onlyGuardian {
-        require(recoveryRequest.timestamp > 0, "nenhuma solicitação pendente");
-        require(!recoveryRequest.executed, "recuperação já executada");
-        require(recoveryRequest.approvalCount >= recoveryThreshold, "aprovações insuficientes");
-        require(block.timestamp >= recoveryRequest.timestamp + recoveryDelay, "período de espera não concluído");
+        require(recoveryRequest.timestamp > 0, unicode"nenhuma solicitação pendente");
+        require(!recoveryRequest.executed, unicode"recuperação já executada");
+        require(recoveryRequest.approvalCount >= recoveryThreshold, unicode"aprovações insuficientes");
+        require(block.timestamp >= recoveryRequest.timestamp + recoveryDelay, unicode"período de espera nao concluído");
         
         address oldOwner = owner;
         address newOwner = recoveryRequest.newOwner;
@@ -234,11 +234,11 @@ contract SocialRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable {
     }
     
     /**
-     * Cancela uma solicitação de recuperação (apenas proprietário)
+     * Cancela uma solicitação de recuperação (apenas proprietario)
      */
     function cancelRecovery() external onlyOwner {
-        require(recoveryRequest.timestamp > 0, "nenhuma solicitação pendente");
-        require(!recoveryRequest.executed, "recuperação já executada");
+        require(recoveryRequest.timestamp > 0, unicode"nenhuma solicitação pendente");
+        require(!recoveryRequest.executed, unicode"recuperação já executada");
         
         delete recoveryRequest;
     }

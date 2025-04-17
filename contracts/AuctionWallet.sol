@@ -18,24 +18,24 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
     // O EntryPoint único que valida as assinaturas
     IEntryPoint private immutable _entryPoint;
 
-    // Endereço do proprietário da conta
+    // Endereço do proprietario da conta
     address public owner;
 
     // Nonce para evitar repetição de transações
     uint256 private _nonce;
 
-    // Evento emitido quando ocorre uma transferência
+    // Evento emitido quando ocorre uma transferencia
     event SimpleAccountInitialized(IEntryPoint indexed entryPoint, address indexed owner);
 
-    // Modificador para restringir ao proprietário
+    // Modificador para restringir ao proprietario
     modifier onlyOwner() {
-        require(msg.sender == owner, "Apenas o proprietário pode chamar");
+        require(msg.sender == owner, "Only owner can call");
         _;
     }
 
-    // Modificador para restringir ao entrypoint ou ao proprietário
+    // Modificador para restringir ao entrypoint ou ao proprietario
     modifier onlyOwnerOrEntryPoint() {
-        require(msg.sender == address(entryPoint()) || msg.sender == owner, "Apenas para proprietário ou entrypoint");
+        require(msg.sender == address(entryPoint()) || msg.sender == owner, "Only owner or entrypoint");
         _;
     }
 
@@ -44,7 +44,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
         return _entryPoint;
     }
 
-    // Erro personalizado para quando o chamador não é o EntryPoint
+    // Erro personalizado para quando o chamador nao é o EntryPoint
     error CallerIsNotEntryPoint();
 
     // Construtor para implantar a implementação
@@ -55,7 +55,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
 
     /**
      * Inicializa a conta.
-     * @param anOwner O proprietário da conta
+     * @param anOwner O proprietario da conta
      */
     function initialize(address anOwner) public virtual initializer {
         _initialize(anOwner);
@@ -84,7 +84,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
      * @param func Funções para executar
      */
     function executeBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func) external onlyOwnerOrEntryPoint {
-        require(dest.length == func.length && (value.length == 0 || value.length == func.length), "Arrays de parâmetros com tamanhos diferentes");
+        require(dest.length == func.length && (value.length == 0 || value.length == func.length), "Arrays with different sizes");
         if (value.length == 0) {
             for (uint256 i = 0; i < dest.length; i++) {
                 _call(dest[i], 0, func[i]);
@@ -97,10 +97,10 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
     }
 
     /**
-     * Implementa o caso de uso: Lance de Leilão Complexo
-     * Permite dar um lance em leilão com ETH + tokens em uma única operação atômica
-     * @param auctionContract Endereço do contrato de leilão
-     * @param auctionId ID do leilão
+     * Implementa o caso de uso: Lance de Leilao Complexo
+     * Permite dar um lance em Leilao com ETH + tokens em uma única operação atômica
+     * @param auctionContract Endereço do contrato de Leilao
+     * @param auctionId ID do Leilao
      * @param ethAmount Quantidade de ETH para o lance
      * @param tokenContract Endereço do contrato do token
      * @param tokenAmount Quantidade de tokens para o lance
@@ -112,7 +112,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
         address tokenContract,
         uint256 tokenAmount
     ) external onlyOwnerOrEntryPoint {
-        // Aprova tokens para o contrato de leilão
+        // Aprova tokens para o contrato de Leilao
         bytes memory approveData = abi.encodeWithSignature(
             "approve(address,uint256)",
             auctionContract,
@@ -120,7 +120,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
         );
         _call(tokenContract, 0, approveData);
 
-        // Dá o lance no leilão
+        // Dá o lance no Leilao
         bytes memory bidData = abi.encodeWithSignature(
             "placeBidComplex(uint256,uint256,uint256)",
             auctionId,
@@ -160,7 +160,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
     /**
      * Obtém o nonce da conta
      */
-    function getNonce() public view returns (uint256) {
+    function getNonce() public view override returns (uint256) {
         return _nonce;
     }
 
@@ -179,17 +179,17 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
     }
 
     /**
-     * Saca ETH da conta para o proprietário
+     * Saca ETH da conta para o proprietario
      * @param amount Quantidade a sacar
      */
     function withdrawETH(uint256 amount) external onlyOwner {
         require(address(this).balance >= amount, "Saldo insuficiente");
         (bool success, ) = owner.call{value: amount}("");
-        require(success, "Falha na transferência");
+        require(success, "Falha na transferencia");
     }
 
     /**
-     * Saca tokens da conta para o proprietário
+     * Saca tokens da conta para o proprietario
      * @param token Endereço do token
      * @param amount Quantidade a sacar
      */
@@ -202,7 +202,7 @@ contract AuctionWallet is BaseAccount, Initializable, UUPSUpgradeable {
      * Implementação da função de upgrade para UUPSUpgradeable
      */
     function _authorizeUpgrade(address) internal view override {
-        require(msg.sender == owner, "Apenas o proprietário pode atualizar");
+        require(msg.sender == owner, "Apenas o proprietario pode atualizar");
     }
 
     receive() external payable {}

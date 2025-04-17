@@ -3,6 +3,7 @@ pragma solidity ^0.8.12;
 
 import "@account-abstraction/contracts/core/BasePaymaster.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
+import "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -10,7 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * SponsorPaymaster: a paymaster that sponsors gas fees for specific users and dapps,
  * allowing for gasless transactions.
  */
-contract SponsorPaymaster is BasePaymaster, Ownable {
+contract SponsorPaymaster is BasePaymaster {
     // Mapping to track sponsored addresses
     mapping(address => bool) public sponsoredAddresses;
     
@@ -43,7 +44,7 @@ contract SponsorPaymaster is BasePaymaster, Ownable {
     event DefaultLimitsUpdated(uint256 dailyLimit, uint256 txLimit);
     event PaymasterFunded(address indexed funder, uint256 amount);
 
-    constructor(IEntryPoint _entryPoint) BasePaymaster(_entryPoint) Ownable(msg.sender) {}
+    constructor(IEntryPoint _entryPoint) BasePaymaster(_entryPoint) {}
 
     /**
      * Add an address to be sponsored with default limits
@@ -233,18 +234,19 @@ contract SponsorPaymaster is BasePaymaster, Ownable {
      * Extract target address from UserOperation callData
      */
     function _extractTarget(UserOperation calldata userOp) internal pure returns (address target) {
-        if (userOp.callData.length < 4 + 32) {
+        bytes calldata data = userOp.callData;
+        if (data.length < 4 + 32) {
             return address(0);
         }
         
-        bytes4 selector = bytes4(userOp.callData[:4]);
+        bytes4 selector = bytes4(data[:4]);
         
         // Check if the function is execute
         if (selector == bytes4(keccak256("execute(address,uint256,bytes)"))) {
             // For execute(), target is the first parameter
             assembly {
                 // Skip selector (4 bytes) and load the address (32 bytes)
-                target := mload(add(userOp.callData, 36))
+                target := calldataload(add(data.offset, 4))
             }
         }
         // Add support for executeBatch if needed

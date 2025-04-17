@@ -1,6 +1,6 @@
-# Autenticação Biométrica em Contas ERC-4337
+# Autenticacao Biométrica em Contas ERC-4337
 
-Este documento detalha a implementação da autenticação biométrica para carteiras inteligentes (smart wallets) baseadas no padrão ERC-4337, direcionada à melhoria da experiência de usuários não técnicos.
+Este documento detalha a implementação da Autenticacao biométrica para carteiras inteligentes (smart wallets) baseadas no padrão ERC-4337, direcionada à melhoria da experiência de usuários nao técnicos.
 
 ## Índice
 
@@ -10,7 +10,7 @@ Este documento detalha a implementação da autenticação biométrica para cart
 4. [Fluxo de Operação](#fluxo-de-operação)
 5. [Instalação e Configuração](#instalação-e-configuração)
 6. [Guia de Uso](#guia-de-uso)
-7. [Autenticação em Dois Fatores (2FA)](#autenticação-em-dois-fatores-2fa)
+7. [Autenticacao em Dois Fatores (2FA)](#Autenticacao-em-dois-fatores-2fa)
 8. [Considerações de Segurança](#considerações-de-segurança)
 9. [Limitações Atuais](#limitações-atuais)
 10. [Roadmap Futuro](#roadmap-futuro)
@@ -18,13 +18,13 @@ Este documento detalha a implementação da autenticação biométrica para cart
 
 ## Visão Geral
 
-A autenticação biométrica para contas ERC-4337 permite que usuários interajam com blockchain Ethereum usando identificação biométrica (impressão digital, reconhecimento facial) em vez de frases-semente ou chaves privadas. Isso simplifica drasticamente a experiência do usuário e elimina uma barreira significativa para adoção em massa.
+A Autenticacao biométrica para contas ERC-4337 permite que usuários interajam com blockchain Ethereum usando identificação biométrica (impressão digital, reconhecimento facial) em vez de frases-semente ou chaves privadas. Isso simplifica drasticamente a experiência do usuário e elimina uma barreira significativa para adoção em massa.
 
 ### Principais Benefícios
 
-- **Sem frases-semente**: Usuários não precisam gerenciar ou memorizar frases mnemônicas
+- **Sem frases-semente**: Usuários nao precisam gerenciar ou memorizar frases mnemônicas
 - **Segurança aprimorada**: Vincula acesso à conta a características físicas únicas do usuário
-- **Experiência familiar**: Utiliza o mesmo método de autenticação que muitos aplicativos móveis
+- **Experiência familiar**: Utiliza o mesmo método de Autenticacao que muitos aplicativos móveis
 - **Recuperação flexível**: Suporta múltiplos dispositivos para redundância e recuperação
 
 ## Arquitetura
@@ -33,7 +33,7 @@ A implementação integra três componentes principais:
 
 1. **Contratos inteligentes**: Implementam a lógica de validação de contas ERC-4337 com suporte a múltiplos dispositivos
 2. **Backend/scripts**: Permitem deployment e gerenciamento das contas biométricas
-3. **Frontend**: Oferece interface para interagir com autenticação biométrica nos dispositivos
+3. **Frontend**: Oferece interface para interagir com Autenticacao biométrica nos dispositivos
 
 ### Diagrama de Arquitetura
 
@@ -64,11 +64,11 @@ A implementação integra três componentes principais:
 
 #### BiometricAuthAccount.sol
 
-Este contrato é uma implementação de conta ERC-4337 que permite autenticação via dispositivos biométricos.
+Este contrato é uma implementação de conta ERC-4337 que permite Autenticacao via dispositivos biométricos.
 
 **Características principais:**
 - Gerenciamento de múltiplos dispositivos autorizados
-- Configuração de número mínimo de dispositivos necessários
+- Configuração de número minimo de dispositivos necessários
 - Validação de assinaturas vinda de dispositivos registrados
 - Suporte à execução de transações individuais e em lote
 
@@ -104,7 +104,7 @@ Módulo JavaScript para interação com a API Web Authentication do navegador e 
 **Funcionalidades:**
 - Detecção de capacidades biométricas do dispositivo
 - Criação e gerenciamento de chaves biométricas
-- Execução de transações com autenticação biométrica
+- Execução de transações com Autenticacao biométrica
 
 #### biometricUI.html
 
@@ -115,9 +115,9 @@ Interface de usuário para criar contas biométricas e executar transações.
 ### Criação de Conta
 
 1. O usuário acessa a interface web no dispositivo móvel
-2. O sistema verifica se o dispositivo suporta autenticação biométrica
+2. O sistema verifica se o dispositivo suporta Autenticacao biométrica
 3. O usuário solicita a criação de uma nova conta biométrica
-4. O sistema solicita autenticação biométrica (impressão digital/face)
+4. O sistema solicita Autenticacao biométrica (impressão digital/face)
 5. O navegador gera um par de chaves criptográficas associado à biometria
 6. O endereço Ethereum é derivado da chave pública
 7. A conta BiometricAuthAccount é criada com o dispositivo registrado
@@ -127,7 +127,7 @@ Interface de usuário para criar contas biométricas e executar transações.
 
 1. O usuário inicia uma transação (ex: envio de tokens)
 2. O sistema prepara a UserOperation conforme ERC-4337
-3. O sistema solicita autenticação biométrica do usuário
+3. O sistema solicita Autenticacao biométrica do usuário
 4. O navegador usa a chave privada protegida por biometria para assinar
 5. A assinatura é enviada ao bundler ERC-4337
 6. O contrato BiometricAuthAccount valida a assinatura
@@ -171,7 +171,7 @@ npm run deploy-biometric-factory
 1. Acesse a interface web no dispositivo móvel
 2. Conecte sua carteira (MetaMask/WalletConnect) 
 3. Clique em "Criar Conta com Biometria"
-4. Siga as instruções para autenticação biométrica
+4. Siga as instruções para Autenticacao biométrica
 5. Confirme a transação de criação de conta
 
 **Via CLI:**
@@ -202,7 +202,7 @@ npx hardhat run scripts/manageBiometricDevices.js --network <rede> -- add 0xCONT
 # Remover dispositivo
 npx hardhat run scripts/manageBiometricDevices.js --network <rede> -- remove 0xCONTA 0xDISPOSITIVO
 
-# Atualizar mínimo de dispositivos
+# Atualizar minimo de dispositivos
 npx hardhat run scripts/manageBiometricDevices.js --network <rede> -- set-min 0xCONTA 2
 ```
 
@@ -214,13 +214,13 @@ npx hardhat run scripts/manageBiometricDevices.js --network <rede> -- set-min 0x
 4. Clique em "Enviar com Biometria"
 5. Autentique-se usando biometria quando solicitado
 
-## Autenticação em Dois Fatores (2FA)
+## Autenticacao em Dois Fatores (2FA)
 
-Além da autenticação biométrica, o sistema suporta integração com Autenticação em Dois Fatores (2FA) para aumentar a segurança e fornecer métodos alternativos de verificação.
+Além da Autenticacao biométrica, o sistema suporta integração com Autenticacao em Dois Fatores (2FA) para aumentar a segurança e fornecer métodos alternativos de verificação.
 
 ### Visão Geral do 2FA
 
-A autenticação em dois fatores adiciona uma camada extra de segurança exigindo dois métodos distintos de verificação antes de autorizar transações ou alterações na conta. Isto segue o princípio de segurança de "algo que você tem" (dispositivo) combinado com "algo que você sabe" (código) ou "algo que você é" (biometria).
+A Autenticacao em dois fatores adiciona uma camada extra de segurança exigindo dois métodos distintos de verificação antes de autorizar transações ou alterações na conta. Isto segue o princípio de segurança de "algo que você tem" (dispositivo) combinado com "algo que você sabe" (código) ou "algo que você é" (biometria).
 
 ### Métodos de 2FA Implementados
 
@@ -228,12 +228,12 @@ A autenticação em dois fatores adiciona uma camada extra de segurança exigind
 
 - Utiliza aplicativos como Google Authenticator, Authy ou Microsoft Authenticator
 - Gera códigos temporários (normalmente de 6 dígitos) que mudam a cada 30 segundos
-- Não requer conexão à internet para gerar códigos
+- nao requer conexão à internet para gerar códigos
 
 #### SMS/E-mail
 
 - Envia códigos de verificação via SMS ou e-mail
-- Útil como método de backup quando o acesso ao autenticador primário não está disponível
+- Útil como método de backup quando o acesso ao autenticador primário nao esta disponível
 - Menos seguro que TOTP, mas oferece redundância
 
 #### Chaves de Segurança Físicas
@@ -248,11 +248,11 @@ O 2FA pode ser integrado às contas biométricas de duas maneiras:
 
 #### 1. Verificação Complementar
 
-Neste modelo, tanto a autenticação biométrica quanto o 2FA são necessários para autorizar transações de alto valor ou operações críticas (ex: adicionar/remover dispositivos).
+Neste modelo, tanto a Autenticacao biométrica quanto o 2FA são necessários para autorizar transações de alto valor ou operações críticas (ex: adicionar/remover dispositivos).
 
 ```
 +----------------+     +-------------------+     +----------------+
-| Autenticação   |     | Verificação       |     | Transação      |
+| Autenticacao   |     | Verificação       |     | Transação      |
 | Biométrica     |---->| de Código 2FA     |---->| Autorizada     |
 |                |     |                   |     |                |
 +----------------+     +-------------------+     +----------------+
@@ -260,11 +260,11 @@ Neste modelo, tanto a autenticação biométrica quanto o 2FA são necessários 
 
 #### 2. Método de Recuperação/Fallback
 
-Neste modelo, o 2FA serve como método alternativo quando a autenticação biométrica não está disponível ou falha.
+Neste modelo, o 2FA serve como método alternativo quando a Autenticacao biométrica nao esta disponível ou falha.
 
 ```
                       +----------------+
-                 +--->| Autenticação   |
+                 +--->| Autenticacao   |
                  |    | Biométrica     |----+
 +------------+   |    +----------------+    |    +----------------+
 | Iniciar    |---+                          +--->| Transação      |
@@ -283,12 +283,12 @@ O sistema implementa 2FA através dos seguintes componentes:
 1. **TwoFactorAuthManager.sol**
    - Contrato que gerencia associações entre contas e métodos 2FA
    - Armazena hashes de segredos TOTP
-   - Valida provas de autenticação
+   - Valida provas de Autenticacao
 
 2. **2FAVerifier.js**
    - Módulo JavaScript para verificar códigos TOTP
    - Gerencia comunicação com APIs de envio de SMS/e-mail
-   - Valida provas de autenticação com chaves físicas
+   - Valida provas de Autenticacao com chaves físicas
 
 #### Frontend
 
@@ -299,7 +299,7 @@ A interface de usuário para 2FA inclui:
    - Validação inicial do código para confirmar configuração correta
    - Opções para adicionar métodos de backup
 
-2. **Fluxo de Autenticação**
+2. **Fluxo de Autenticacao**
    - Campo para inserção de código TOTP
    - Suporte para NFC/USB para chaves físicas
    - Opções para solicitar códigos alternativos via SMS/e-mail
@@ -319,8 +319,8 @@ A interface de usuário para 2FA inclui:
 #### Autorização de Transação
 
 1. Usuário inicia uma transação
-2. Sistema solicita autenticação biométrica (primeiro fator)
-3. Após aprovação biométrica, solicita código 2FA (segundo fator)
+2. Sistema solicita Autenticacao biométrica (primeiro fator)
+3. Após Aprovacao biométrica, solicita código 2FA (segundo fator)
 4. Sistema verifica o código:
    - TOTP: verifica se o código corresponde ao esperado para o timestamp atual
    - SMS/E-mail: verifica se o código enviado corresponde ao digitado
@@ -329,8 +329,8 @@ A interface de usuário para 2FA inclui:
 
 ### Benefícios do 2FA
 
-1. **Segurança Aprimorada**: Mitigação de riscos mesmo se um fator de autenticação for comprometido
-2. **Flexibilidade**: Múltiplas opções de autenticação adaptadas às necessidades do usuário
+1. **Segurança Aprimorada**: Mitigação de riscos mesmo se um fator de Autenticacao for comprometido
+2. **Flexibilidade**: Múltiplas opções de Autenticacao adaptadas às necessidades do usuário
 3. **Redundância**: Métodos alternativos garantem acesso mesmo se um sistema falhar
 4. **Proteção contra Phishing**: Chaves físicas e TOTP são resistentes a ataques de phishing
 5. **Conformidade**: Atende requisitos de segurança para aplicações financeiras
@@ -354,7 +354,7 @@ npx hardhat run scripts/verify2FA.js --network <rede> -- 0xCONTA 123456
 ### Considerações de Segurança Específicas para 2FA
 
 - **SMS**: Vulnerável a ataques de SIM swapping; use apenas como backup
-- **E-mail**: Sensível à segurança da conta de e-mail; use com autenticação forte
+- **E-mail**: Sensível à segurança da conta de e-mail; use com Autenticacao forte
 - **TOTP**: Proteja o segredo inicial durante a configuração
 - **Backup de Códigos**: Forneça códigos de recuperação para emergências
 
@@ -364,7 +364,7 @@ O 2FA pode ser combinado com mecanismos de recuperação social para criar um si
 
 1. Para operações de baixo risco: apenas 2FA
 2. Para operações de médio risco: biometria + 2FA
-3. Para recuperação de conta: biometria/2FA + aprovação de guardiões sociais
+3. Para recuperação de conta: biometria/2FA + Aprovacao de guardiões sociais
 
 ## Considerações de Segurança
 
@@ -374,7 +374,7 @@ A segurança da implementação atual depende de:
 
 1. **Segurança do dispositivo**: O dispositivo do usuário deve estar seguro e livre de malware
 2. **Implementação WebAuthn**: A segurança da API WebAuthn e seu enclave seguro no dispositivo
-3. **Número mínimo de dispositivos**: Configurar adequadamente para balancear conveniência e segurança
+3. **Número minimo de dispositivos**: Configurar adequadamente para balancear conveniência e segurança
 4. **Smart contract**: Validação adequada de assinaturas e controle de acesso
 
 ### Práticas Recomendadas
@@ -386,7 +386,7 @@ A segurança da implementação atual depende de:
 
 ### Limitações do WebAuthn
 
-- A autenticação é específica para o dispositivo e navegador usados
+- A Autenticacao é específica para o dispositivo e navegador usados
 - Algumas implementações WebAuthn têm quirks específicos por navegador
 - Requer HTTPS ou localhost para funcionar
 
@@ -395,7 +395,7 @@ A segurança da implementação atual depende de:
 1. **Simulação vs Implementação Real**: A versão atual simula a API WebAuthn para fins de demonstração
 2. **Recuperação de Conta**: Sistema de recuperação limitado se todos os dispositivos forem perdidos
 3. **UX em Diferentes Navegadores**: Experiência inconsistente entre diferentes navegadores/SO
-4. **Rastreamento off-chain**: Não há mecanismo on-chain para listar todos os dispositivos
+4. **Rastreamento off-chain**: nao há mecanismo on-chain para listar todos os dispositivos
 5. **Custos de Gas**: Adicionar/remover dispositivos requer transações que consomem gas
 
 ## Roadmap Futuro

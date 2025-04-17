@@ -24,13 +24,13 @@ A solução implementada permite que a empresa configure uma nova lista de signa
 3. **deploy-corporate-recovery.js**
    - Script para demonstração completa do fluxo de recuperação
    - Simulação de perda de dispositivos
-   - Demonstração do tempo de espera e processo de aprovação
+   - Demonstração do tempo de espera e processo de Aprovacao
 
 ## Fluxo de Recuperação
 
 1. **Trigger de Recuperação** - Um dos signatários remanescentes inicia o processo através de `initiateRecovery()`, propondo a nova lista de signatários.
 
-2. **Aprovação por Signatários** - Outros signatários remanescentes aprovam a solicitação usando `approveRecovery()`.
+2. **Aprovacao por Signatários** - Outros signatários remanescentes aprovam a solicitação usando `approveRecovery()`.
 
 3. **Período de Espera** - Um período obrigatório de 7 dias (configurável) é aplicado para prevenir ataques.
 
@@ -42,7 +42,7 @@ A solução implementada permite que a empresa configure uma nova lista de signa
 
 - **Threshold de Recuperação**: Exige apenas que um signatário autorizado inicie o processo, mas a recuperação só é executada após o período de espera.
 - **Período de Segurança**: Padrão de 7 dias, configurável pela própria empresa entre 1 e 30 dias.
-- **Requisitos de Novos Signatários**: Mínimo de 3 signatários na nova configuração, sem duplicatas.
+- **Requisitos de Novos Signatários**: minimo de 3 signatários na nova configuração, sem duplicatas.
 - **Segurança Adicional**: Eventos emitidos para auditoria e rastreabilidade em todas as etapas.
 
 ## Diagrama de Fluxo

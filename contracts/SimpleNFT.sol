@@ -7,13 +7,15 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title SimpleNFT
- * @dev Contrato de NFT simples para fins de teste com o leilão
+ * @dev Contrato de NFT simples para fins de teste com o Leilao
  */
 contract SimpleNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor(address initialOwner) ERC721("SimpleNFT", "SNFT") Ownable(initialOwner) {}
+    constructor(address initialOwner) ERC721("SimpleNFT", "SNFT") {
+        _transferOwnership(initialOwner);
+    }
 
     /**
      * @dev Cria um novo NFT

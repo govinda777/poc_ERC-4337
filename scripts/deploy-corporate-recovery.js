@@ -168,7 +168,7 @@ async function main() {
     await wallet.connect(newSigner1).executeTransaction(newTxIndex);
     console.log("Transação pós-recuperação executada com sucesso!");
   } else {
-    console.error("Erro: Não foi possível executar a recuperação!");
+    console.error("Erro: nao foi possível executar a recuperação!");
   }
   
   console.log("\n=========================================");

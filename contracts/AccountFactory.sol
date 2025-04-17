@@ -6,7 +6,7 @@ import "./AuctionAccount.sol";
 
 /**
  * @title AccountFactory
- * @dev Factory para criar contas que podem interagir com o leilão NFT usando o padrão ERC-4337
+ * @dev Factory para criar contas que podem interagir com o Leilao NFT usando o padrão ERC-4337
  */
 contract AccountFactory {
     EntryPoint public immutable entryPoint;
@@ -21,14 +21,14 @@ contract AccountFactory {
      * @dev Construtor que inicializa o factory com um EntryPoint
      * @param _entryPoint Endereço do contrato EntryPoint
      */
-    constructor(address _entryPoint) {
+    constructor(address payable _entryPoint) {
         require(_entryPoint != address(0), "EntryPoint cannot be zero address");
         entryPoint = EntryPoint(_entryPoint);
     }
     
     /**
      * @dev Cria uma nova conta para o usuário
-     * @param owner Endereço do proprietário da conta
+     * @param owner Endereço do proprietario da conta
      * @param salt Valor de salt para cálculo de endereço
      * @return account Endereço da nova conta criada
      */
@@ -52,7 +52,7 @@ contract AccountFactory {
     
     /**
      * @dev Calcula o endereço da conta antes da criação
-     * @param owner Endereço do proprietário da conta
+     * @param owner Endereço do proprietario da conta
      * @param salt Valor de salt para o cálculo de endereço
      * @return Endereço previsto da conta
      */

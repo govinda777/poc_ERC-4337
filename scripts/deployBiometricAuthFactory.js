@@ -11,7 +11,7 @@ async function main() {
     entryPointAddress = addresses.entryPoint;
     console.log("EntryPoint encontrado em:", entryPointAddress);
   } catch (error) {
-    console.log("EntryPoint não encontrado. Implantando um novo...");
+    console.log("EntryPoint nao encontrado. Implantando um novo...");
     const EntryPoint = await hre.ethers.getContractFactory("EntryPoint");
     const entryPoint = await EntryPoint.deploy();
     await entryPoint.deployed();
