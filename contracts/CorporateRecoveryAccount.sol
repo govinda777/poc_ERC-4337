@@ -179,8 +179,6 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
         onlySigner 
         returns (uint256 txIndex) 
     {
-        require(destination != address(0), "destino nao pode ser endereco zero");
-        
         txIndex = transactionCount;
         
         transactions[txIndex] = Transaction({
@@ -188,7 +186,7 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
             value: value,
             data: data,
             executed: false,
-            numConfirmations: 1, // Auto-confirmação
+            numConfirmations: 1,
             proposedAt: block.timestamp
         });
         
@@ -196,8 +194,6 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
         transactionCount++;
         
         emit TransactionProposed(txIndex, msg.sender, destination, value);
-        emit TransactionConfirmed(txIndex, msg.sender);
-        
         return txIndex;
     }
     
@@ -349,29 +345,25 @@ contract CorporateRecoveryAccount is BaseAccount, Initializable, UUPSUpgradeable
     function recoverAccess() external onlySigner {
         require(recoveryRequest.requestTime > 0, "nenhuma solicitacao pendente");
         require(!recoveryRequest.executed, "recuperacao ja executada");
-        require(block.timestamp >= recoveryRequest.requestTime + recoveryRequest.recoveryCooldown, 
-                "Aguarde 7 dias");
+        require(
+            block.timestamp >= recoveryRequest.requestTime + recoveryRequest.recoveryCooldown,
+            "Aguarde 7 dias"
+        );
         
-        // Preparar para registro de signatários antigos
-        uint256 count = _signers.length();
-        address[] memory oldSigners = new address[](count);
-        for (uint256 i = 0; i < count; i++) {
+        // Armazenar signatários antigos para o evento
+        address[] memory oldSigners = new address[](_signers.length());
+        for (uint256 i = 0; i < oldSigners.length; i++) {
             oldSigners[i] = _signers.at(i);
         }
         
-        // Remover todos os signatários antigos
-        for (uint256 i = 0; i < count; i++) {
+        // Limpar signatários antigos
+        for (uint256 i = 0; i < oldSigners.length; i++) {
             _signers.remove(oldSigners[i]);
         }
         
         // Adicionar novos signatários
         for (uint256 i = 0; i < recoveryRequest.newSigners.length; i++) {
             _signers.add(recoveryRequest.newSigners[i]);
-        }
-        
-        // Atualizar o limite de assinaturas se necessário
-        if (signatureThreshold > _signers.length()) {
-            signatureThreshold = _signers.length();
         }
         
         recoveryRequest.executed = true;

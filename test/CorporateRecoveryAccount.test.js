@@ -7,14 +7,27 @@ describe("Recuperação de Carteira Corporativa", function () {
   let factory;
   let wallet;
   let walletAddress;
-  let deployer, signer1, signer2, signer3, signer4, signer5, newSigner1, newSigner2;
+  let deployer, signer1, signer2, signer3, signer4, signer5, newSigner1, newSigner2, guardian1, guardian2, guardian3;
+  let guardians;
   
   // Configurações iniciais
   const RECOVERY_COOLDOWN = 7 * 24 * 60 * 60; // 7 dias em segundos
   
   before(async function () {
     // Obter signers para teste
-    [deployer, signer1, signer2, signer3, signer4, signer5, newSigner1, newSigner2] = await ethers.getSigners();
+    [
+      deployer,
+      signer1,
+      signer2,
+      signer3,
+      signer4,
+      signer5,
+      newSigner1,
+      newSigner2,
+      guardian1,
+      guardian2,
+      guardian3
+    ] = await ethers.getSigners();
     
     // Lista de signatários para a carteira corporativa (3/5)
     const initialSigners = [
@@ -23,6 +36,13 @@ describe("Recuperação de Carteira Corporativa", function () {
       signer3.address,
       signer4.address,
       signer5.address
+    ];
+
+    // Lista de guardiões
+    guardians = [
+      guardian1.address,
+      guardian2.address,
+      guardian3.address
     ];
     
     // Deploy do EntryPoint (mock)
@@ -35,8 +55,8 @@ describe("Recuperação de Carteira Corporativa", function () {
     factory = await CorporateRecoveryAccountFactory.deploy(entryPoint.address);
     await factory.deployed();
     
-    // Criar uma carteira corporativa com threshold 3/5
-    const tx = await factory.createAccount(initialSigners, 3, 123456);
+    // Criar uma carteira corporativa com threshold 3/5 e guardiões
+    const tx = await factory.createAccount(initialSigners, 3, guardians, 123456);
     const receipt = await tx.wait();
     
     // Obter endereço da carteira através do evento
