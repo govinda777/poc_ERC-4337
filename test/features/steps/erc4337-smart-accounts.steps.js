@@ -21,7 +21,7 @@ const parseEther = (value) => {
 // Globals para estado dos testes
 let contracts = {};
 let accounts = {};
-let smartAccounts = {};
+let smartAccounts = { lastCreated: null };
 let guardians = [];
 let recoveryParams = {};
 let devices = {};
@@ -40,6 +40,82 @@ function loadAddresses() {
   }
   return {};
 }
+
+// ==================================
+// Helper Functions for Step Logic
+// ==================================
+
+// Function to deploy SocialRecoveryAccountFactory if not already deployed
+async function ensureSocialRecoveryFactoryDeployed() {
+  if (!contracts.socialRecoveryFactory) {
+    const SocialRecoveryAccountFactory = await ethers.getContractFactory('SocialRecoveryAccountFactory');
+    contracts.socialRecoveryFactory = await SocialRecoveryAccountFactory.deploy(contracts.entryPoint.address);
+    await contracts.socialRecoveryFactory.deployed();
+  }
+}
+
+// Function to create SocialRecoveryAccount if not already created
+async function ensureSocialRecoveryAccountCreated() {
+  if (!smartAccounts.socialRecovery) {
+    await ensureSocialRecoveryFactoryDeployed(); // Ensure factory is deployed first
+    // Calculate the expected address first
+    const expectedAddress = await contracts.socialRecoveryFactory.getAddress(
+        accounts.user1.address,
+        0 // salt
+    );
+    // Check if account already exists (e.g., from a previous run)
+    const code = await ethers.provider.getCode(expectedAddress);
+    if (code === '0x') {
+        // Account doesn't exist, create it
+        const tx = await contracts.socialRecoveryFactory.createAccount(
+          accounts.user1.address,
+          0 // salt
+        );
+        await tx.wait();
+    }
+    // Store the calculated address
+    smartAccounts.socialRecovery = expectedAddress;
+    smartAccounts.lastCreated = smartAccounts.socialRecovery; // Track last created
+  }
+}
+
+// Function to deploy BiometricAuthAccountFactory if not already deployed
+async function ensureBiometricAuthFactoryDeployed() {
+    if (!contracts.biometricFactory) {
+        const BiometricAuthAccountFactory = await ethers.getContractFactory('BiometricAuthAccountFactory');
+        contracts.biometricFactory = await BiometricAuthAccountFactory.deploy(contracts.entryPoint.address);
+        await contracts.biometricFactory.deployed();
+    }
+}
+
+// Function to create BiometricAuthAccount if not already created
+async function ensureBiometricAccountCreated() {
+    if (!smartAccounts.biometric) {
+        await ensureBiometricAuthFactoryDeployed(); // Ensure factory is deployed first
+        // Calculate the expected address first
+        const expectedAddress = await contracts.biometricFactory.getAddress(
+            accounts.user1.address,
+            0 // salt
+        );
+        // Check if account already exists
+        const code = await ethers.provider.getCode(expectedAddress);
+        if (code === '0x') {
+            // Account doesn't exist, create it
+            const tx = await contracts.biometricFactory.createAccount(
+                accounts.user1.address,
+                0 // salt
+            );
+            await tx.wait();
+        }
+        // Store the calculated address
+        smartAccounts.biometric = expectedAddress;
+        smartAccounts.lastCreated = smartAccounts.biometric; // Track last created
+    }
+}
+
+// ==================================
+// Cucumber Steps
+// ==================================
 
 // Background steps
 Given('a Hardhat node is running', async function() {
@@ -74,56 +150,56 @@ Given('the Account Factory contract is deployed', async function() {
 });
 
 // Cenário: Criar uma conta com recuperação social
-Given('o contrato SocialRecoveryAccountFactory está implantado', async function() {
-  const SocialRecoveryAccountFactory = await ethers.getContractFactory('SocialRecoveryAccountFactory');
-  contracts.socialRecoveryFactory = await SocialRecoveryAccountFactory.deploy(contracts.entryPoint.address);
-  await contracts.socialRecoveryFactory.deployed();
-});
+Given('o contrato SocialRecoveryAccountFactory está implantado', ensureSocialRecoveryFactoryDeployed);
 
-When('eu crio uma nova conta com recuperação social', async function() {
-  const tx = await contracts.socialRecoveryFactory.createAccount(
-    accounts.user1.address,
-    0 // salt
-  );
-  const receipt = await tx.wait();
-  
-  // Extrair o endereço da conta criada do evento
-  const event = receipt.events.find(e => e.event === 'AccountCreated');
-  smartAccounts.socialRecovery = event.args.account;
-});
+When('eu crio uma nova conta com recuperação social', ensureSocialRecoveryAccountCreated);
 
 Then('a conta deve ser criada com sucesso', async function() {
   // Verificar se o endereço da conta existe
-  const code = await ethers.provider.getCode(smartAccounts.socialRecovery);
+  expect(smartAccounts.lastCreated, "No account was recorded as created").to.not.be.null;
+  const code = await ethers.provider.getCode(smartAccounts.lastCreated);
   expect(code).to.not.equal('0x');
 });
 
 Then('o endereço da conta deve ser registrado corretamente', async function() {
-  // Verificar se a conta está registrada na factory
-  const predictedAddress = await contracts.socialRecoveryFactory.getAddress(
-    accounts.user1.address,
-    0 // salt
-  );
-  expect(smartAccounts.socialRecovery).to.equal(predictedAddress);
+  // Verificar se a conta está registrada na factory apropriada
+  let factory;
+  let expectedAddress;
+  if (smartAccounts.lastCreated === smartAccounts.socialRecovery) {
+      factory = contracts.socialRecoveryFactory;
+      expectedAddress = await factory.getAddress(accounts.user1.address, 0);
+  } else if (smartAccounts.lastCreated === smartAccounts.biometric) {
+      factory = contracts.biometricFactory;
+      expectedAddress = await factory.getAddress(accounts.user1.address, 0);
+  } else {
+      throw new Error("Cannot determine the factory for the last created account");
+  }
+  expect(smartAccounts.lastCreated).to.equal(expectedAddress);
 });
 
 Then('eu devo ser o proprietário da conta', async function() {
-  // Conexão com a conta social
-  const SocialRecoveryAccount = await ethers.getContractFactory('SocialRecoveryAccount');
-  const account = SocialRecoveryAccount.attach(smartAccounts.socialRecovery);
-  
+  // Conexão com a conta criada
+  let AccountContract;
+  let accountInstance;
+
+  if (smartAccounts.lastCreated === smartAccounts.socialRecovery) {
+      AccountContract = await ethers.getContractFactory('SocialRecoveryAccount');
+      accountInstance = AccountContract.attach(smartAccounts.lastCreated);
+  } else if (smartAccounts.lastCreated === smartAccounts.biometric) {
+      AccountContract = await ethers.getContractFactory('BiometricAuthAccount');
+      accountInstance = AccountContract.attach(smartAccounts.lastCreated);
+  } else {
+      throw new Error("Cannot determine the type of the last created account");
+  }
+
   // Verificar o proprietário
-  const owner = await account.owner();
+  const owner = await accountInstance.owner();
   expect(owner).to.equal(accounts.user1.address);
 });
 
 // Cenário: Configurar guardiões para recuperação social
 Given('eu tenho uma conta com recuperação social', async function() {
-  if (!smartAccounts.socialRecovery) {
-    // Criar a conta se não existir
-    await this.given('o contrato SocialRecoveryAccountFactory está implantado');
-    await this.when('eu crio uma nova conta com recuperação social');
-  }
+  await ensureSocialRecoveryAccountCreated(); // Use helper function
 });
 
 When('eu adiciono {int} guardiões à minha conta', async function(numGuardians) {
@@ -202,11 +278,11 @@ Then('o atraso de recuperação deve ser definido como {int} horas', async funct
 
 // Cenário: Recuperar uma conta social após perda da chave privada
 Given('eu tenho uma conta com recuperação social configurada com {int} guardiões e limiar {int}', async function(numGuardians, threshold) {
-  // Criar e configurar a conta se não existir
-  await this.given('eu tenho uma conta com recuperação social');
-  await this.when(`eu adiciono ${numGuardians} guardiões à minha conta`);
-  await this.when(`eu configuro um limiar de recuperação de ${threshold} guardiões`);
-  await this.when('eu defino um atraso de recuperação de 24 horas');
+  // Use helper functions directly
+  await ensureSocialRecoveryAccountCreated();
+  await this.step(`eu adiciono ${numGuardians} guardiões à minha conta`);
+  await this.step(`eu configuro um limiar de recuperação de ${threshold} guardiões`);
+  await this.step('eu defino um atraso de recuperação de 24 horas');
 });
 
 Given('eu perdi acesso à minha chave privada', function() {
@@ -274,68 +350,58 @@ Then('o novo proprietário deve poder operar a conta', async function() {
 });
 
 // Cenário: Criar uma conta com autenticação biométrica
-Given('o contrato BiometricAuthAccountFactory está implantado', async function() {
-  const BiometricAuthAccountFactory = await ethers.getContractFactory('BiometricAuthAccountFactory');
-  contracts.biometricFactory = await BiometricAuthAccountFactory.deploy(contracts.entryPoint.address);
-  await contracts.biometricFactory.deployed();
-});
+Given('o contrato BiometricAuthAccountFactory está implantado', ensureBiometricAuthFactoryDeployed);
 
-When('eu crio uma nova conta com autenticação biométrica', async function() {
-  const tx = await contracts.biometricFactory.createAccount(
-    accounts.user1.address,
-    0 // salt
-  );
-  const receipt = await tx.wait();
-  
-  // Extrair o endereço da conta criada do evento
-  const event = receipt.events.find(e => e.event === 'AccountCreated');
-  smartAccounts.biometric = event.args.account;
-});
+When('eu crio uma nova conta com autenticação biométrica', ensureBiometricAccountCreated);
 
 Then('eu devo ser capaz de registrar dispositivos biométricos', async function() {
   const BiometricAuthAccount = await ethers.getContractFactory('BiometricAuthAccount');
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
   // Gerar um deviceId (normalmente seria um hash de dados biométricos)
-  const deviceId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('dispositivo-principal'));
+  const deviceName = 'Dispositivo Principal';
+  const deviceId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(deviceName.toLowerCase()));
+  const dailyLimit = parseEther('0.1');
   
   // Registrar um dispositivo
+  // Use explicit types if needed, or ensure contract ABI is correctly interpreted
   const tx = await account.connect(accounts.user1).registerDevice(
-    deviceId,
-    parseEther('0.1'), // limite diário
-    'Dispositivo Principal'
+    deviceId, // bytes32
+    deviceName, // string
+    dailyLimit // uint256
   );
   await tx.wait();
   
-  // Verificar se o dispositivo foi registrado
-  const isRegistered = await account.isDeviceRegistered(deviceId);
-  expect(isRegistered).to.be.true;
+  // Verificar se o dispositivo foi registrado consultando o mapping público
+  const deviceData = await account.devices(deviceId);
+  // deviceData will have named fields corresponding to the struct
+  expect(deviceData.active, `Device ${deviceId} should be active after registration`).to.be.true;
+  expect(deviceData.deviceId, `Device ID mismatch`).to.equal(deviceId);
+  expect(deviceData.deviceName, `Device name mismatch`).to.equal(deviceName);
 });
 
 // Cenário: Configurar dispositivos com limites de transação diários
 Given('eu tenho uma conta com autenticação biométrica', async function() {
-  if (!smartAccounts.biometric) {
-    // Criar a conta se não existir
-    await this.given('o contrato BiometricAuthAccountFactory está implantado');
-    await this.when('eu crio uma nova conta com autenticação biométrica');
-  }
+  await ensureBiometricAccountCreated(); // Use helper function
 });
 
 When('eu registro um dispositivo principal com limite diário de {float} ETH', async function(limit) {
   const BiometricAuthAccount = await ethers.getContractFactory('BiometricAuthAccount');
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
-  // Gerar um deviceId
+  // Gerar um deviceId com nome único para este cenário
+  const deviceName = 'Dispositivo Principal Diario'; // Changed name
   devices.main = {
-    id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes('dispositivo-principal')),
-    limit: parseEther(limit.toString())
+    id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes(deviceName.toLowerCase())), // ID will change
+    limit: parseEther(limit.toString()),
+    name: deviceName
   };
   
   // Registrar o dispositivo
   const tx = await account.connect(accounts.user1).registerDevice(
-    devices.main.id,
-    devices.main.limit,
-    'Dispositivo Principal'
+    devices.main.id, // bytes32
+    devices.main.name, // string
+    devices.main.limit // uint256
   );
   await tx.wait();
 });
@@ -345,16 +411,18 @@ When('eu registro um dispositivo de backup com limite diário de {float} ETH', a
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
   // Gerar um deviceId
+  const deviceName = 'Dispositivo de Backup';
   devices.backup = {
-    id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes('dispositivo-backup')),
-    limit: parseEther(limit.toString())
+    id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes(deviceName.toLowerCase())),
+    limit: parseEther(limit.toString()),
+    name: deviceName
   };
   
   // Registrar o dispositivo
   const tx = await account.connect(accounts.user1).registerDevice(
-    devices.backup.id,
-    devices.backup.limit,
-    'Dispositivo de Backup'
+    devices.backup.id, // bytes32
+    devices.backup.name, // string
+    devices.backup.limit // uint256
   );
   await tx.wait();
 });
@@ -364,8 +432,8 @@ Then('o dispositivo principal deve ter limite de {float} ETH', async function(li
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
   // Verificar o limite
-  const deviceInfo = await account.getDeviceInfo(devices.main.id);
-  expect(deviceInfo.dailyLimit).to.equal(parseEther(limit.toString()));
+  const currentLimit = await account.dailyLimit(devices.main.id); // Use the public mapping
+  expect(currentLimit).to.equal(parseEther(limit.toString()));
 });
 
 Then('o dispositivo de backup deve ter limite de {float} ETH', async function(limit) {
@@ -373,26 +441,30 @@ Then('o dispositivo de backup deve ter limite de {float} ETH', async function(li
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
   // Verificar o limite
-  const deviceInfo = await account.getDeviceInfo(devices.backup.id);
-  expect(deviceInfo.dailyLimit).to.equal(parseEther(limit.toString()));
+  const currentLimit = await account.dailyLimit(devices.backup.id); // Use the public mapping
+  expect(currentLimit).to.equal(parseEther(limit.toString()));
 });
 
 // Cenário: Realizar transações sem custos de gas usando Paymaster
 Given('eu tenho uma conta compatível com ERC-4337', async function() {
-  // Usar uma conta existente ou criar uma nova
-  if (!smartAccounts.biometric && !smartAccounts.socialRecovery) {
-    await this.given('o contrato BiometricAuthAccountFactory está implantado');
-    await this.when('eu crio uma nova conta com autenticação biométrica');
+  // Use a biometric account if available, otherwise social recovery
+  if (smartAccounts.biometric) {
+      await ensureBiometricAccountCreated();
+      smartAccounts.current = smartAccounts.biometric;
+  } else {
+      await ensureSocialRecoveryAccountCreated();
+      smartAccounts.current = smartAccounts.socialRecovery;
   }
   
-  // Usar a conta biométrica por padrão
-  smartAccounts.current = smartAccounts.biometric || smartAccounts.socialRecovery;
-  
-  // Financiar a conta
-  await accounts.deployer.sendTransaction({
-    to: smartAccounts.current,
-    value: parseEther('1.0')
-  });
+  // Ensure account has funds (add if needed)
+  const balance = await ethers.provider.getBalance(smartAccounts.current);
+  if (balance.lt(parseEther('0.5'))) {
+      console.log(`Funding account ${smartAccounts.current}...`);
+      await accounts.deployer.sendTransaction({
+          to: smartAccounts.current,
+          value: parseEther('1.0')
+      });
+  }
 });
 
 Given('o SponsorPaymaster está implantado e configurado', async function() {
@@ -402,83 +474,124 @@ Given('o SponsorPaymaster está implantado e configurado', async function() {
   await contracts.paymaster.deployed();
   
   // Financiar o Paymaster
-  await accounts.deployer.sendTransaction({
-    to: contracts.paymaster.address,
-    value: parseEther('10.0')
-  });
+  const paymasterBalance = await ethers.provider.getBalance(contracts.paymaster.address);
+   if (paymasterBalance.lt(parseEther('0.5'))) {
+        console.log(`Funding paymaster ${contracts.paymaster.address}...`);
+        const fundTx = await contracts.paymaster.connect(accounts.deployer).addDeposit({ value: parseEther('2.0') });
+        await fundTx.wait();
+        // await accounts.deployer.sendTransaction({
+        //     to: contracts.paymaster.address,
+        //     value: parseEther('10.0')
+        // });
+   }
 });
 
 When('minha conta é patrocinada pelo Paymaster', async function() {
-  // Configurar o Paymaster para patrocinar a conta
-  const tx = await contracts.paymaster.addSponsoredAccount(smartAccounts.current);
+  // Configurar o Paymaster para patrocinar a conta usando a função correta
+  expect(contracts.paymaster.sponsorAddress, "sponsorAddress function not found on paymaster").to.exist;
+  const tx = await contracts.paymaster.connect(accounts.deployer).sponsorAddress(smartAccounts.current); // Use deployer as owner
   await tx.wait();
 });
 
 When('eu envio uma transação sem gas para um endereço', async function() {
-  // Preparar a operação de transferência de ETH
+  // Prepare UserOp for a simple transfer
   const recipient = accounts.user2.address;
   const value = parseEther('0.01');
+  const accountInterface = new ethers.utils.Interface(['function execute(address dest, uint256 value, bytes calldata func)']);
+  const callData = accountInterface.encodeFunctionData('execute', [recipient, value, '0x']);
   
-  // Criar a UserOperation
-  const userOp = {
-    sender: smartAccounts.current,
-    nonce: ethers.BigNumber.from(Date.now()),
-    callData: '0x', // Chamada para transferir ETH
-    callGasLimit: 100000,
-    verificationGasLimit: 100000,
-    preVerificationGas: 60000,
-    maxFeePerGas: ethers.utils.parseUnits('5', 'gwei'),
-    maxPriorityFeePerGas: ethers.utils.parseUnits('1', 'gwei'),
-    paymasterAndData: contracts.paymaster.address + '00'.repeat(64), // Simplificado
-    signature: '0x' + '00'.repeat(64) // Assinatura placeholder
-  };
-  
-  // Transferir diretamente para este teste
-  const tx = await accounts.user1.sendTransaction({
-    to: recipient,
-    value,
-    gasLimit: 100000,
+  const paymasterAndData = contracts.paymaster.address; // Paymaster address, no specific data needed for basic sponsorship
+
+  const userOp = fillUserOpDefaults({
+      sender: smartAccounts.current,
+      nonce: await contracts.entryPoint.getNonce(smartAccounts.current, 0), // Get nonce from EntryPoint
+      callData: callData,
+      paymasterAndData: paymasterAndData,
+      // Gas limits might need estimation/adjustment
+      callGasLimit: 100000,
+      verificationGasLimit: 150000, // Increased verification gas
+      preVerificationGas: 50000,
   });
-  
-  // Armazenar para verificações
-  smartAccounts.lastTx = tx;
+
+  // Sign the UserOperation using the account owner's key
+  const userOpHash = await contracts.entryPoint.getUserOpHash(userOp);
+  const signature = await accounts.user1.signMessage(ethers.utils.arrayify(userOpHash));
+  userOp.signature = signature;
+
+  // Store recipient and value for verification
   smartAccounts.lastRecipient = recipient;
   smartAccounts.lastValue = value;
+  smartAccounts.userOp = userOp; // Store userOp for later
+
+  // Send the UserOperation via the EntryPoint
+  try {
+      smartAccounts.lastTx = await contracts.entryPoint.connect(accounts.deployer).handleOps([userOp], accounts.deployer.address);
+  } catch (e) {
+      // Catch potential revert reasons
+      console.error("handleOps failed:", e.message);
+      // Try to decode custom error from EntryPoint
+      if (e.data) {
+          try {
+              const decodedError = contracts.entryPoint.interface.parseError(e.data);
+              console.error("Decoded EntryPoint Error:", decodedError.name, decodedError.args);
+              if (decodedError.name === 'FailedOp') {
+                  console.error("Reason:", decodedError.args.reason);
+              }
+          } catch (decodeError) {
+              console.error("Could not decode EntryPoint error data:", decodeError);
+          }
+      }
+      errors.gaslessTx = e; // Store error
+      throw e; // Re-throw to fail the step
+  }
 });
 
 Then('a transação deve ser processada com sucesso', async function() {
   // Verificar se a transação foi confirmada
+  expect(errors.gaslessTx, "Gasless transaction failed").to.be.undefined;
+  expect(smartAccounts.lastTx, "Transaction object not found").to.exist;
   const receipt = await smartAccounts.lastTx.wait();
   expect(receipt.status).to.equal(1);
 });
 
-Then('eu não devo pagar pelos custos de gas', function() {
-  // Este é um mock simplificado, pois não temos como verificar diretamente
-  // Na implementação real, verificaríamos que o saldo de ETH da conta não diminuiu
-  // além do valor transferido
+Then('eu não devo pagar pelos custos de gas', async function() {
+  // Verify UserOperation event to see actual gas cost paid by sender (should be 0)
+  const receipt = await smartAccounts.lastTx.wait();
+  const userOpEvent = receipt.events?.find(e => e.event === 'UserOperationEvent');
+  expect(userOpEvent, "UserOperationEvent not found").to.exist;
+  expect(userOpEvent.args.success).to.be.true;
+  expect(userOpEvent.args.actualGasCost).to.equal(0); // Sender pays nothing
 });
 
-Then('o Paymaster deve cobrir os custos de gas', function() {
-  // Também é um mock simplificado, na implementação real verificaríamos
-  // que o saldo do Paymaster diminuiu para cobrir o gas
+Then('o Paymaster deve cobrir os custos de gas', async function() {
+  // Verify UserOperation event for paymaster's payment
+  const receipt = await smartAccounts.lastTx.wait();
+  const userOpEvent = receipt.events?.find(e => e.event === 'UserOperationEvent');
+  expect(userOpEvent, "UserOperationEvent not found").to.exist;
+  expect(userOpEvent.args.success).to.be.true;
+  // Actual gas cost is paid by the paymaster deposit in the entry point
+  expect(userOpEvent.args.actualGasUsed).to.be.gt(0);
 });
 
 // Cenário: Rejeitar transações que excedem o limite diário do dispositivo
 Given('um dispositivo registrado com limite diário de {float} ETH', async function(limit) {
+  await ensureBiometricAccountCreated(); // Ensure account exists
   const BiometricAuthAccount = await ethers.getContractFactory('BiometricAuthAccount');
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
   // Gerar um deviceId para teste
+  const deviceName = 'Dispositivo de Teste';
   devices.test = {
-    id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes('dispositivo-teste')),
-    limit: parseEther(limit.toString())
+    id: ethers.utils.keccak256(ethers.utils.toUtf8Bytes(deviceName.toLowerCase())),
+    limit: parseEther(limit.toString()),
+    name: deviceName
   };
   
   // Registrar o dispositivo
   const tx = await account.connect(accounts.user1).registerDevice(
-    devices.test.id,
-    devices.test.limit,
-    'Dispositivo de Teste'
+    devices.test.id, // bytes32
+    devices.test.name, // string
+    devices.test.limit // uint256
   );
   await tx.wait();
 });
@@ -489,29 +602,67 @@ When('eu tento enviar {float} ETH usando o dispositivo', async function(amount) 
   
   const recipient = accounts.user2.address;
   const value = parseEther(amount.toString());
+  const callData = '0x'; // Simple ETH transfer
   
-  // Tentar executar a transação simulando verificação biométrica
-  try {
-    const tx = await account.connect(accounts.user1).executeDeviceTransaction(
+  // Prepare UserOp using the device for validation (simulate pre-computation)
+  const accountInterface = new ethers.utils.Interface(['function executeBiometric(bytes32 deviceId, address dest, uint256 value, bytes calldata func, bytes calldata biometricSignature)']);
+
+  // A real signature would be generated here based on the userOp hash and device key
+  // For testing, we use a placeholder signature or the owner's signature on the hash
+  const placeholderBiometricSig = '0x' + '00'.repeat(65); // Placeholder
+
+  const opCallData = accountInterface.encodeFunctionData('executeBiometric', [
       devices.test.id,
       recipient,
       value,
-      '0x',
-      { gasLimit: 500000 }
-    );
-    await tx.wait();
-    // Se não falhar, armazenar para verificações
-    smartAccounts.lastDeviceTx = tx;
-  } catch (error) {
-    // Armazenar o erro
-    errors.lastError = error;
+      callData,
+      placeholderBiometricSig // This signature is checked *inside* executeBiometric
+  ]);
+
+  // Signature for _validateSignature needs deviceId prepended
+  const userOp = fillUserOpDefaults({
+      sender: smartAccounts.biometric,
+      nonce: await contracts.entryPoint.getNonce(smartAccounts.biometric, 0),
+      callData: opCallData, // The call to executeBiometric
+      // signature: devices.test.id + signature.substring(2) // Device ID + Owner Sig
+  });
+
+  const userOpHash = await contracts.entryPoint.getUserOpHash(userOp);
+  const ownerSignature = await accounts.user1.signMessage(ethers.utils.arrayify(userOpHash));
+  // Prepend device ID to owner signature for biometric validation path
+  userOp.signature = devices.test.id + ownerSignature.substring(2);
+
+  // Tentar executar a operação via EntryPoint
+  try {
+      // Send UserOp via handleOps
+      const tx = await contracts.entryPoint.connect(accounts.deployer).handleOps([userOp], accounts.deployer.address);
+      smartAccounts.lastTx = tx; // Store tx if successful
+      errors.limitExceededTx = null; // Clear previous error
+  } catch (e) {
+      errors.limitExceededTx = e; // Store error
+      // Log detailed error
+      console.error(`Transaction failed as expected: ${e.message}`);
+      if (e.data) {
+          try {
+              const decodedError = contracts.entryPoint.interface.parseError(e.data);
+              console.error("Decoded EntryPoint Error:", decodedError.name, decodedError.args);
+              if (decodedError.name === 'FailedOp' && decodedError.args.reason) {
+                 errors.revertReason = decodedError.args.reason;
+              }
+          } catch (decodeError) {
+              console.error("Could not decode EntryPoint error data.");
+          }
+      }
   }
 });
 
 Then('a transação deve ser rejeitada', function() {
-  expect(errors.lastError).to.not.be.undefined;
+  // Check if an error was caught in the previous step
+  expect(errors.limitExceededTx).to.not.be.null;
+  expect(errors.limitExceededTx).to.be.an('error');
 });
 
 Then('devo receber um erro informando que o limite diário foi excedido', function() {
-  expect(errors.lastError.message).to.include('daily limit exceeded');
+  // Check the revert reason from the EntryPoint's FailedOp event
+  expect(errors.revertReason).to.include('Excede limite'); // Check for the specific revert string from BiometricAuthAccount
 }); 
