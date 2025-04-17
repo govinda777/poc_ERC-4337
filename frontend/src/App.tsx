@@ -1,97 +1,78 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { WagmiConfig, createConfig } from 'wagmi';
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
-import { sepolia } from 'wagmi/chains';
-import { Header } from './components/layout/Header';
-import { Footer } from './components/layout/Footer';
-import { Sidebar } from './components/layout/Sidebar';
-import { Web3ContextProvider } from './context/Web3Context';
-import { UserOperationContextProvider } from './context/UserOperationContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Web3Provider } from './contexts/Web3Context';
+import Dashboard from './pages/Dashboard';
+import './App.css';
 
-// Pages
-import Home from './pages/Home';
-import SocialLogin from './pages/SocialLogin';
-import DeFiInsurance from './pages/DeFiInsurance';
-import BatchPayments from './pages/BatchPayments';
-import CorporateRecovery from './pages/CorporateRecovery';
-import EntryPointExplorer from './pages/EntryPointExplorer';
-import NotFound from './pages/NotFound';
+// Placeholder pages - would be implemented in full app
+const CreateAccount = () => (
+  <div className="container mt-5">
+    <h1>Criar Conta</h1>
+    <p>Esta página será implementada em breve.</p>
+  </div>
+);
 
-// Configuração do Wagmi para integração com carteiras
-const chains = [sepolia];
-const wagmiConfig = createConfig(
-  getDefaultConfig({
-    appName: 'POC ERC-4337',
-    alchemyId: import.meta.env.VITE_ALCHEMY_API_KEY,
-    walletConnectProjectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
-    chains
-  })
+const Login = () => (
+  <div className="container mt-5">
+    <h1>Login</h1>
+    <p>Esta página será implementada em breve.</p>
+  </div>
+);
+
+const NotFound = () => (
+  <div className="container mt-5 text-center">
+    <h1>404 - Página Não Encontrada</h1>
+    <p>A página que você procura não existe.</p>
+  </div>
 );
 
 function App() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detectar se o dispositivo é móvel para ajustar o layout
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <ConnectKitProvider>
-        <Web3ContextProvider>
-          <UserOperationContextProvider>
-            <Router>
-              <div className="flex flex-col min-h-screen bg-gray-50">
-                <Header />
-                
-                <div className="flex flex-1">
-                  {!isMobile && <Sidebar />}
-                  
-                  <main className="flex-1 p-4">
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/social-login" element={<SocialLogin />} />
-                      <Route path="/defi-insurance" element={<DeFiInsurance />} />
-                      <Route path="/batch-payments" element={<BatchPayments />} />
-                      <Route path="/corporate-recovery" element={<CorporateRecovery />} />
-                      <Route path="/entry-point-explorer" element={<EntryPointExplorer />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </main>
-                </div>
-                
-                <Footer />
+    <Web3Provider>
+      <Router>
+        <div className="app-container">
+          <header className="app-header bg-dark text-white p-3">
+            <div className="container">
+              <div className="d-flex justify-content-between align-items-center">
+                <h1 className="h3 mb-0">ERC-4337 Wallet</h1>
+                <nav>
+                  <a href="/" className="text-white me-3">Dashboard</a>
+                  <a href="/create-account" className="text-white me-3">Criar Conta</a>
+                  <a href="/login" className="text-white">Login</a>
+                </nav>
               </div>
-            </Router>
-            
-            <ToastContainer
-              position="bottom-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
-          </UserOperationContextProvider>
-        </Web3ContextProvider>
-      </ConnectKitProvider>
-    </WagmiConfig>
+            </div>
+          </header>
+          
+          <main className="app-content">
+            <div className="container mt-4">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/create-account" element={<CreateAccount />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </main>
+          
+          <footer className="app-footer bg-light p-3 mt-5">
+            <div className="container">
+              <div className="row">
+                <div className="col-md-6">
+                  <p className="mb-0">ERC-4337 Wallet &copy; 2023</p>
+                </div>
+                <div className="col-md-6 text-md-end">
+                  <a href="https://github.com/govinda777/poc_ERC-4337" target="_blank" rel="noreferrer">
+                    GitHub
+                  </a>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </Router>
+    </Web3Provider>
   );
 }
 

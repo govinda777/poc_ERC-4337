@@ -360,6 +360,108 @@ Este menu serve como guia estruturado para implementação completa da especific
 
 ---
 
-## 📝 Conclusão
+## Correlação entre Classes do Projeto e Itens de Menu
 
-Esta POC serve como implementação de referência completa do ERC-4337, exemplificando todos os componentes e funcionalidades da especificação. Ao seguir este menu, desenvolvedores podem compreender, implementar e estender a Account Abstraction em seus próprios projetos de forma intuitiva e prática.
+Abaixo está a correlação entre os itens do [MENU.md][1] do projeto e as principais classes/arquivos presentes no repositório [govinda777/poc_ERC-4337](https://github.com/govinda777/poc_ERC-4337). Cada item do menu é relacionado aos contratos, scripts ou componentes de código que implementam ou representam aquela funcionalidade.
+
+### 1. Fundamentos ERC-4337
+- **1.1 a 1.4**: São tópicos conceituais e de documentação. Não correspondem diretamente a classes, mas são suportados por arquivos de documentação e diagramas presentes na pasta `/docs` ou README.
+
+### 2. Config
+- **2.1. Ambiente de Desenvolvimento**:  
+  - Arquivos: `hardhat.config.js`, `foundry.toml`, scripts em `/scripts`  
+- **2.2. Configuração de Redes**:  
+  - Arquivos: `networks.js`, `.env.example`, configurações em `hardhat.config.js`  
+- **2.3. Dependências e Ferramentas**:  
+  - Arquivo: `package.json`  
+- **2.4. Segurança e Chaves**:  
+  - Uso de `.env`, scripts de gerenciamento de chaves, práticas em scripts de deploy
+
+### 3. Contratos Inteligentes
+| Item de Menu                       | Classe/Arquivo Principal                        |
+|-------------------------------------|-------------------------------------------------|
+| 3.1. EntryPoint                    | `contracts/EntryPoint.sol`                      |
+| 3.2. Contratos de Conta            | `contracts/BaseAccount.sol``contracts/SocialLoginAccount.sol``contracts/MultiSigAccount.sol``contracts/AutomatedAccount.sol``contracts/DeFiInsuranceAccount.sol` |
+| 3.3. Factories                     | `contracts/AccountFactory.sol`                  |
+| 3.4. Paymasters                    | `contracts/VerifyingPaymaster.sol``contracts/TokenPaymaster.sol``contracts/SponsoredPaymaster.sol``contracts/SessionKeyPaymaster.sol` |
+
+### 4. Implementações Práticas
+| Item de Menu                       | Classe/Arquivo/Componente                      |
+|-------------------------------------|------------------------------------------------|
+| 4.1. Carteira com Login Social      | `contracts/SocialLoginAccount.sol`Backend OAuth (pasta `/backend` ou `/auth`) |
+| 4.2. Seguro DeFi com Resgate        | `contracts/DeFiInsuranceAccount.sol`Integrações com oráculos (`/oracles`) |
+| 4.3. Pagamentos em Lote             | Funções batch em `BaseAccount.sol` ou contas específicas |
+| 4.4. Recuperação de Conta Corporativa| `contracts/MultiSigAccount.sol`Implementações de guardiões e timelock |
+
+### 5. Bundler e Infraestrutura
+| Item de Menu                       | Classe/Arquivo/Componente                      |
+|-------------------------------------|------------------------------------------------|
+| 5.1. Bundler                       | `bundler/` (Node.js, scripts de bundler)       |
+| 5.2. Mempool Alternativo           | `bundler/mempool.js` ou equivalente            |
+| 5.3. RPC Personalizado              | `bundler/rpc.js`, endpoints JSON-RPC           |
+| 5.4. Monitoramento e Métricas       | Dashboards (`/monitoring`), integração com Prometheus/Grafana |
+
+### 6. Integrações
+| Item de Menu                       | Classe/Arquivo/Componente                      |
+|-------------------------------------|------------------------------------------------|
+| 6.1. Frontend Web3                 | `frontend/` (React, componentes de UI)         |
+| 6.2. SDKs e Bibliotecas            | `sdk/`, `client/`, exemplos em `/examples`     |
+| 6.3. Oráculos e Serviços Externos  | `oracles/`, integrações API                    |
+| 6.4. Sistemas de Notificação       | `notifications/`, microserviços de alerta      |
+
+### 7. Testes e Validação
+| Item de Menu                       | Classe/Arquivo/Componente                      |
+|-------------------------------------|------------------------------------------------|
+| 7.1. Testes Unitários              | `test/` (testes para contratos e scripts)      |
+| 7.2. Testes de Integração          | `test/integration/`, scripts E2E               |
+| 7.3. Testes de Estresse            | `test/stress/`, scripts de carga               |
+| 7.4. Auditoria de Segurança        | Ferramentas de análise estática, scripts de auditoria |
+
+---
+
+## Tabela Resumida de Correlação
+
+| Menu Principal                      | Classe/Arquivo/Componente Relacionado         |
+|--------------------------------------|-----------------------------------------------|
+| 1. Fundamentos ERC-4337              | Documentação, `/docs`, README                 |
+| 2. Config                            | `hardhat.config.js`, `.env`, `package.json`   |
+| 3. Contratos Inteligentes            | `EntryPoint.sol`, `BaseAccount.sol`, Paymasters, Factories |
+| 4. Implementações Práticas           | `SocialLoginAccount.sol`, `DeFiInsuranceAccount.sol`, `MultiSigAccount.sol` |
+| 5. Bundler e Infraestrutura          | `bundler/`, `mempool.js`, `rpc.js`            |
+| 6. Integrações                       | `frontend/`, `sdk/`, `oracles/`, `notifications/` |
+| 7. Testes e Validação                | `test/`, ferramentas de auditoria             |
+
+---
+
+## Observações
+
+- O projeto segue a estrutura modular sugerida pelo menu, com contratos inteligentes separados para cada funcionalidade e componentes de infraestrutura (bundler, mempool, RPC) implementados em scripts e serviços distintos.
+- Cada item do menu pode corresponder a múltiplos arquivos ou pastas, especialmente nas implementações práticas e integrações, que envolvem tanto contratos quanto componentes backend/frontend.
+- Para detalhes específicos de cada classe, consulte a pasta `contracts/` e os subdiretórios correspondentes no repositório[1].
+
+---
+
+**Referência:**[1] MENU.md do projeto poc_ERC-4337
+
+Citations:
+[1] https://github.com/govinda777/poc_ERC-4337/blob/main/MENU.md
+[2] https://erc.europa.eu/sites/default/files/2025-01/erc-2024-poc-2-dl2-results_list.pdf
+[3] https://github.com/videocoin/vivid-wallet-erc4337
+[4] https://hackmd.io/@V00D00-child/SJOnAnxF2
+[5] https://www.erc4337.io
+[6] https://github.com/ethereum/ercs/blob/master/ERCS/erc-4337.md
+[7] https://www.alchemy.com/list-of/account-abstraction-erc-4337-bundlers-on-ethereum
+[8] https://erc.europa.eu/apply-grant/proof-concept
+[9] https://www.quicknode.com/guides/ethereum-development/wallets/account-abstraction-and-erc-4337
+[10] https://www.youtube.com/watch?v=1pE261Tbjcc
+[11] https://docs.stackup.sh/docs/erc-4337-overview
+[12] https://medium.portto.com/meet-the-top-10-erc-4337-projects-to-watch-in-2023-pt-1-638db7beaba8
+[13] https://www.radixdlt.com/blog/comparing-account-abstraction-and-radix-smart-accounts
+[14] https://www.alchemy.com/list-of/account-abstraction-erc-4337-bundlers-on-arbitrum
+[15] https://metalamp.io/magazine/article/why-is-native-account-abstraction-in-zksync-better-than-erc-4337
+[16] https://www.jpmorgan.com/kinexys/documents/portfolio-management-powered-by-tokenization.pdf
+[17] https://github.com/topics/erc-4337
+[18] https://www.okx.com/learn/account-abstraction
+[19] https://github.com/4337Mafia/awesome-account-abstraction
+[20] https://github.com/passkeys-4337/smart-wallet
+[21] https://github.com/coinbase/smart-wallet
