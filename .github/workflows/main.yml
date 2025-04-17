@@ -10,26 +10,41 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Debug environment
+        run: |
+          echo "GitHub runner info:"
+          echo "OS: $(uname -a)"
+          echo "GitHub Actions runner version: ${{ runner.os }}-${{ runner.arch }}"
+          echo "Available disk space:"
+          df -h
+          echo "Memory info:"
+          free -h
+          echo "GitHub context:"
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Workspace: ${{ github.workspace }}"
+          
+      - uses: actions/checkout@v1
       
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
-          node-version: '18'
-          cache: 'yarn'
+          node-version: '16'
       
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          npm install -g yarn
+          yarn install --frozen-lockfile
       
-      - name: Cache Hardhat compilation
-        uses: actions/cache@v2
-        with:
-          path: |
-            cache
-            artifacts
-          key: ${{ runner.os }}-hardhat-${{ hashFiles('contracts/**/*.sol') }}
-          restore-keys: |
-            ${{ runner.os }}-hardhat-
+      - name: Manual cache for Hardhat
+        run: |
+          mkdir -p ~/.cache-hardhat
+          if [ -d "cache" ]; then
+            cp -r cache ~/.cache-hardhat/
+          fi
+          if [ -d "artifacts" ]; then
+            cp -r artifacts ~/.cache-hardhat/
+          fi
         
       - name: Check script permissions
         run: |
@@ -43,6 +58,15 @@ jobs:
       - name: Compile contracts
         run: yarn compile
         
+      - name: Restore from manual cache
+        run: |
+          if [ -d "~/.cache-hardhat/cache" ]; then
+            cp -r ~/.cache-hardhat/cache .
+          fi
+          if [ -d "~/.cache-hardhat/artifacts" ]; then
+            cp -r ~/.cache-hardhat/artifacts .
+          fi
+        
       - name: Troubleshooting info
         run: |
           echo "Node version: $(node -v)"
@@ -55,29 +79,29 @@ jobs:
       - name: Run BDD tests for ERC-4337
         run: yarn test:bdd-erc4337
         
-      - name: Store test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: cucumber-report
-          path: cucumber-report.html
-          if-no-files-found: ignore
-        
       - name: Run unit tests
         run: yarn test
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Debug environment
+        run: |
+          echo "GitHub runner info:"
+          echo "OS: $(uname -a)"
+          echo "GitHub Actions runner version: ${{ runner.os }}-${{ runner.arch }}"
+      
+      - uses: actions/checkout@v1
       
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
-          node-version: '18'
-          cache: 'yarn'
+          node-version: '16'
       
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          npm install -g yarn
+          yarn install --frozen-lockfile
         
       - name: Run solidity linter
         run: yarn solhint 'contracts/**/*.sol'
@@ -87,26 +111,33 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Debug environment
+        run: |
+          echo "GitHub runner info:"
+          echo "OS: $(uname -a)"
+          echo "GitHub Actions runner version: ${{ runner.os }}-${{ runner.arch }}"
+      
+      - uses: actions/checkout@v1
       
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v1
         with:
-          node-version: '18'
-          cache: 'yarn'
+          node-version: '16'
       
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          npm install -g yarn
+          yarn install --frozen-lockfile
       
-      - name: Cache Hardhat compilation
-        uses: actions/cache@v2
-        with:
-          path: |
-            cache
-            artifacts
-          key: ${{ runner.os }}-hardhat-${{ hashFiles('contracts/**/*.sol') }}
-          restore-keys: |
-            ${{ runner.os }}-hardhat-
+      - name: Manual cache for Hardhat
+        run: |
+          mkdir -p ~/.cache-hardhat
+          if [ -d "cache" ]; then
+            cp -r cache ~/.cache-hardhat/
+          fi
+          if [ -d "artifacts" ]; then
+            cp -r artifacts ~/.cache-hardhat/
+          fi
         
       - name: Setup environment
         run: |
