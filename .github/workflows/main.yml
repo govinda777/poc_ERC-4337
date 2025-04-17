@@ -10,10 +10,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           node-version: '18'
           cache: 'yarn'
@@ -22,7 +22,7 @@ jobs:
         run: yarn install --frozen-lockfile
       
       - name: Cache Hardhat compilation
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: |
             cache
@@ -30,6 +30,12 @@ jobs:
           key: ${{ runner.os }}-hardhat-${{ hashFiles('contracts/**/*.sol') }}
           restore-keys: |
             ${{ runner.os }}-hardhat-
+        
+      - name: Check script permissions
+        run: |
+          ls -la scripts/
+          chmod +x scripts/verify-ci.sh
+          ls -la scripts/verify-ci.sh
         
       - name: Verify CI environment
         run: ./scripts/verify-ci.sh
@@ -50,7 +56,7 @@ jobs:
         run: yarn test:bdd-erc4337
         
       - name: Store test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: cucumber-report
           path: cucumber-report.html
@@ -62,10 +68,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           node-version: '18'
           cache: 'yarn'
@@ -81,10 +87,10 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           node-version: '18'
           cache: 'yarn'
@@ -93,7 +99,7 @@ jobs:
         run: yarn install --frozen-lockfile
       
       - name: Cache Hardhat compilation
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: |
             cache
