@@ -238,14 +238,16 @@ contract BiometricAuthAccount is BaseAccount, Initializable, UUPSUpgradeable {
         }
         
         // Verificar se esta dentro do limite diario
-        require(dailyUsage[deviceId].used + value <= dailyLimit[deviceId], "Excede limite diario");
+        uint256 currentUsed = dailyUsage[deviceId].used;
+        uint256 currentLimit = dailyLimit[deviceId];
+        require(currentUsed + value <= currentLimit, "Excede limite diario");
         
         // Verificar assinatura biométrica (simplificado para exemplo)
         // Em produção, isso seria uma verificação complexa incluindo challenge-response
         require(_verifyBiometricSignature(deviceId, biometricSignature), "Autenticacao falhou");
         
         // Atualizar uso diario
-        dailyUsage[deviceId].used += value;
+        dailyUsage[deviceId].used = currentUsed + value;
         
         // Executar a transação
         _call(dest, value, func);
