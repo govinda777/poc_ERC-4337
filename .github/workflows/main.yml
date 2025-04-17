@@ -15,11 +15,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
         
       - name: Compile contracts
         run: npm run compile
@@ -38,11 +38,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
         
       - name: Run solidity linter
         run: npx solhint 'contracts/**/*.sol'
@@ -57,11 +57,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'npm'
       
       - name: Install dependencies
-        run: npm ci
+        run: npm install
         
       - name: Setup environment
         run: |
