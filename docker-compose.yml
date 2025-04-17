@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  erc4337-smart-wallet:
+    build: .
+    container_name: erc4337-smart-wallet
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app/contracts
+      - ./test:/app/test
+      - ./scripts:/app/scripts
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped 

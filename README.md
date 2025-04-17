@@ -198,31 +198,50 @@ Para testar uma transação sem gas (patrocinada):
 npm run gasless-tx
 ```
 
-### Solução de Problemas
+## CI/CD Pipeline
 
-#### Erro de Nonce
-Se encontrar erros relacionados a nonce:
+Este projeto possui uma pipeline de integração e entrega contínua configurada com GitHub Actions.
+
+### Estrutura da Pipeline
+
+A pipeline consiste em três jobs principais:
+
+1. **Test**: Executa todos os testes automatizados, incluindo os testes BDD específicos para ERC-4337
+2. **Lint**: Executa análise estática do código para garantir a qualidade e padrões
+3. **Deploy**: Realiza o deploy dos contratos na testnet Sepolia (apenas em pushes para main/master)
+
+### Execução Local
+
+Para executar a pipeline localmente, você pode usar o pre-commit hook que já está configurado:
 
 ```bash
-npx hardhat clean
-npm run compile
+git add .
+git commit -m "sua mensagem de commit"
 ```
 
-#### Problemas com o Node Local
-Reinicie o node Hardhat:
+Este comando executará automaticamente os testes BDD do ERC-4337 antes de finalizar o commit.
+
+### Containerização
+
+O projeto possui configuração Docker para facilitar a execução em diferentes ambientes:
+
+#### Executar com Docker
 
 ```bash
-# Ctrl+C para parar o node atual
-npm run node
+# Construir a imagem
+docker build -t erc4337-smart-wallet .
+
+# Executar o container
+docker run -p 8545:8545 erc4337-smart-wallet
 ```
 
-#### Erro de Conexão com RPC
-Verifique se o node Hardhat esta rodando e se o URL no .env esta correto.
+#### Executar com Docker Compose
 
-#### Problemas com o Script de Inicialização
-Se o script `start:app` apresentar problemas:
-- Verifique se o script tem permissão de execução: `chmod +x scripts/start.sh scripts/stop.sh`
-- Certifique-se de que o diretório `logs` existe: `mkdir -p logs`
+```bash
+docker-compose up
+```
+
+Isso iniciará a aplicação completa em um container isolado, expondo a porta 8545 para acesso local.
 
 ## Casos de test
 

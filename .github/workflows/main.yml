@@ -1,0 +1,77 @@
+name: ERC-4337 Smart Wallet CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Compile contracts
+        run: npm run compile
+        
+      - name: Run BDD tests for ERC-4337
+        run: npm run test:bdd-erc4337
+        
+      - name: Run unit tests
+        run: npm run test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run solidity linter
+        run: npx solhint 'contracts/**/*.sol'
+
+  deploy:
+    needs: [test, lint]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Setup environment
+        run: |
+          echo "Setting up environment variables..."
+          # Copy example env to .env for deployment purposes
+          cp .env.example .env
+          
+      - name: Deploy to Sepolia testnet
+        run: npm run deploy:sepolia
+        env:
+          PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }} 
