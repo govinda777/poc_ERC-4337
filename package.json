@@ -8,7 +8,7 @@
     "test": "hardhat test",
     "test:corporate": "hardhat test test/CorporateRecovery*.test.js --network hardhat",
     "test:bdd": "cucumber-js",
-    "test:bdd-erc4337": "cucumber-js --tags @erc4337",
+    "test:bdd-erc4337": "cucumber-js --tags @erc4337 && open cucumber-report.html",
     "node": "hardhat node",
     "deploy": "hardhat run scripts/deploy.js --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
