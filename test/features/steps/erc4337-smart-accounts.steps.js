@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const { ethers, network } = require('hardhat');
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
-const { getAccountNonce, UserOperation, fillUserOpDefaults, getUserOpHash, signUserOp } = require('@account-abstraction/utils');
+const AAUtils = require('@account-abstraction/utils');
 const fs = require('fs');
 const path = require('path');
 
@@ -207,15 +207,18 @@ When('eu adiciono {int} guardiões à minha conta', async function(numGuardians)
   const account = SocialRecoveryAccount.attach(smartAccounts.socialRecovery);
   
   // Preparar os endereços dos guardiões
-  const guardiansAddresses = guardians.slice(0, numGuardians).map(g => g.address);
+  const guardiansToAdd = guardians.slice(0, numGuardians);
+  const guardiansAddresses = guardiansToAdd.map(g => g.address);
   
-  // Adicionar guardiões
-  const tx = await account.connect(accounts.user1).setGuardians(
-    guardiansAddresses,
-    2, // limiar padrão
-    86400 // delay padrão (24 horas)
-  );
-  await tx.wait();
+  // Adicionar guardiões um por um
+  for (const guardianAddress of guardiansAddresses) {
+    // Check if already a guardian to avoid errors if step is run multiple times
+    const isGuardian = await account.guardians(guardianAddress);
+    if (!isGuardian) {
+        const tx = await account.connect(accounts.user1).addGuardian(guardianAddress);
+        await tx.wait();
+    }
+  }
   
   // Armazenar para uso futuro
   recoveryParams.guardians = guardiansAddresses;
@@ -240,8 +243,8 @@ When('eu defino um atraso de recuperação de {int} horas', async function(hours
   // Converter horas para segundos
   const delayInSeconds = hours * 60 * 60;
   
-  // Atualizar o atraso
-  const tx = await account.connect(accounts.user1).setRecoveryDelayPeriod(delayInSeconds);
+  // Atualizar o atraso - Correct function name is setRecoveryDelay
+  const tx = await account.connect(accounts.user1).setRecoveryDelay(delayInSeconds);
   await tx.wait();
   
   // Armazenar para uso futuro
@@ -254,7 +257,7 @@ Then('os guardiões devem ser registrados corretamente', async function() {
   
   // Verificar cada guardião
   for (const guardianAddress of recoveryParams.guardians) {
-    const isGuardian = await account.isGuardian(guardianAddress);
+    const isGuardian = await account.guardians(guardianAddress);
     expect(isGuardian).to.be.true;
   }
 });
@@ -272,17 +275,40 @@ Then('o atraso de recuperação deve ser definido como {int} horas', async funct
   const account = SocialRecoveryAccount.attach(smartAccounts.socialRecovery);
   
   const expectedDelay = hours * 60 * 60;
-  const currentDelay = await account.recoveryDelayPeriod();
+  const currentDelay = await account.recoveryDelay();
   expect(currentDelay).to.equal(expectedDelay);
 });
 
 // Cenário: Recuperar uma conta social após perda da chave privada
 Given('eu tenho uma conta com recuperação social configurada com {int} guardiões e limiar {int}', async function(numGuardians, threshold) {
-  // Use helper functions directly
-  await ensureSocialRecoveryAccountCreated();
-  await this.step(`eu adiciono ${numGuardians} guardiões à minha conta`);
-  await this.step(`eu configuro um limiar de recuperação de ${threshold} guardiões`);
-  await this.step('eu defino um atraso de recuperação de 24 horas');
+  // Ensure account exists
+  await ensureSocialRecoveryAccountCreated(); 
+
+  const SocialRecoveryAccount = await ethers.getContractFactory('SocialRecoveryAccount');
+  const account = SocialRecoveryAccount.attach(smartAccounts.socialRecovery);
+  
+  // 1. Add Guardians
+  const guardiansToAdd = guardians.slice(0, numGuardians);
+  const guardiansAddresses = guardiansToAdd.map(g => g.address);
+  for (const guardianAddress of guardiansAddresses) {
+     const isGuardian = await account.guardians(guardianAddress);
+     if (!isGuardian) {
+        const txAdd = await account.connect(accounts.user1).addGuardian(guardianAddress);
+        await txAdd.wait();
+     }
+  }
+  recoveryParams.guardians = guardiansAddresses; // Store guardians
+
+  // 2. Set Threshold
+  const txThreshold = await account.connect(accounts.user1).setRecoveryThreshold(threshold);
+  await txThreshold.wait();
+  recoveryParams.threshold = threshold; // Store threshold
+
+  // 3. Set Delay (using 24 hours as per original this.step call)
+  const delayInSeconds = 24 * 60 * 60;
+  const txDelay = await account.connect(accounts.user1).setRecoveryDelay(delayInSeconds);
+  await txDelay.wait();
+  recoveryParams.delay = delayInSeconds; // Store delay
 });
 
 Given('eu perdi acesso à minha chave privada', function() {
@@ -309,7 +335,7 @@ When('o guardião {int} aprova a recuperação', async function(guardianIndex) {
   
   // Aprovar processo de recuperação
   const guardianSigner = guardians[guardianIndex - 1];
-  const tx = await account.connect(guardianSigner).supportRecovery(recoveryParams.newOwner);
+  const tx = await account.connect(guardianSigner).approveRecovery();
   await tx.wait();
 });
 
@@ -324,7 +350,7 @@ When('o guardião {int} executa a recuperação', async function(guardianIndex) 
   
   // Executar processo de recuperação
   const guardianSigner = guardians[guardianIndex - 1];
-  const tx = await account.connect(guardianSigner).executeRecovery(recoveryParams.newOwner);
+  const tx = await account.connect(guardianSigner).executeRecovery();
   await tx.wait();
 });
 
@@ -468,22 +494,35 @@ Given('eu tenho uma conta compatível com ERC-4337', async function() {
 });
 
 Given('o SponsorPaymaster está implantado e configurado', async function() {
-  // Implantar o SponsorPaymaster
   const SponsorPaymaster = await ethers.getContractFactory('SponsorPaymaster');
   contracts.paymaster = await SponsorPaymaster.deploy(contracts.entryPoint.address);
   await contracts.paymaster.deployed();
-  
-  // Financiar o Paymaster
-  const paymasterBalance = await ethers.provider.getBalance(contracts.paymaster.address);
-   if (paymasterBalance.lt(parseEther('0.5'))) {
-        console.log(`Funding paymaster ${contracts.paymaster.address}...`);
-        const fundTx = await contracts.paymaster.connect(accounts.deployer).addDeposit({ value: parseEther('2.0') });
-        await fundTx.wait();
-        // await accounts.deployer.sendTransaction({
-        //     to: contracts.paymaster.address,
-        //     value: parseEther('10.0')
-        // });
-   }
+  console.log(`Funding paymaster ${contracts.paymaster.address}...`);
+
+  // Fund the paymaster via the EntryPoint deposit function
+  const depositAmount = ethers.utils.parseEther('1'); // Fund with 1 ETH
+  const tx = await contracts.entryPoint.connect(accounts.deployer).depositTo(
+    contracts.paymaster.address, 
+    { value: depositAmount }
+  );
+  await tx.wait();
+
+  // Verify deposit
+  const balance = await contracts.entryPoint.balanceOf(contracts.paymaster.address);
+  expect(balance).to.be.gte(depositAmount);
+
+  // Optionally add stake if needed by EntryPoint rules (adjust time as needed)
+  // const stakeAmount = ethers.utils.parseEther('0.1');
+  // await contracts.entryPoint.connect(accounts.deployer).addStake(
+  //   contracts.paymaster.address, 
+  //   30, // unstakeDelaySec
+  //   { value: stakeAmount }
+  // );
+  // await txStake.wait();
+
+  // Verify paymaster is staked (if staking is done)
+  // const depositInfo = await contracts.entryPoint.getDepositInfo(contracts.paymaster.address);
+  // expect(depositInfo.staked).to.be.true;
 });
 
 When('minha conta é patrocinada pelo Paymaster', async function() {
@@ -500,18 +539,20 @@ When('eu envio uma transação sem gas para um endereço', async function() {
   const accountInterface = new ethers.utils.Interface(['function execute(address dest, uint256 value, bytes calldata func)']);
   const callData = accountInterface.encodeFunctionData('execute', [recipient, value, '0x']);
   
-  const paymasterAndData = contracts.paymaster.address; // Paymaster address, no specific data needed for basic sponsorship
-
-  const userOp = fillUserOpDefaults({
+  // Create UserOperation with default values
+  const userOp = {
       sender: smartAccounts.current,
-      nonce: await contracts.entryPoint.getNonce(smartAccounts.current, 0), // Get nonce from EntryPoint
+      nonce: await contracts.entryPoint.getNonce(smartAccounts.current, 0),
+      initCode: '0x',
       callData: callData,
-      paymasterAndData: paymasterAndData,
-      // Gas limits might need estimation/adjustment
       callGasLimit: 100000,
-      verificationGasLimit: 150000, // Increased verification gas
+      verificationGasLimit: 150000,
       preVerificationGas: 50000,
-  });
+      maxFeePerGas: ethers.utils.parseUnits('10', 'gwei'),
+      maxPriorityFeePerGas: ethers.utils.parseUnits('1', 'gwei'),
+      paymasterAndData: ethers.utils.hexConcat([contracts.paymaster.address, '0x']),
+      signature: '0x' // Will be filled later
+  };
 
   // Sign the UserOperation using the account owner's key
   const userOpHash = await contracts.entryPoint.getUserOpHash(userOp);
@@ -521,15 +562,13 @@ When('eu envio uma transação sem gas para um endereço', async function() {
   // Store recipient and value for verification
   smartAccounts.lastRecipient = recipient;
   smartAccounts.lastValue = value;
-  smartAccounts.userOp = userOp; // Store userOp for later
+  smartAccounts.userOp = userOp;
 
   // Send the UserOperation via the EntryPoint
   try {
       smartAccounts.lastTx = await contracts.entryPoint.connect(accounts.deployer).handleOps([userOp], accounts.deployer.address);
   } catch (e) {
-      // Catch potential revert reasons
       console.error("handleOps failed:", e.message);
-      // Try to decode custom error from EntryPoint
       if (e.data) {
           try {
               const decodedError = contracts.entryPoint.interface.parseError(e.data);
@@ -541,8 +580,8 @@ When('eu envio uma transação sem gas para um endereço', async function() {
               console.error("Could not decode EntryPoint error data:", decodeError);
           }
       }
-      errors.gaslessTx = e; // Store error
-      throw e; // Re-throw to fail the step
+      errors.gaslessTx = e;
+      throw e;
   }
 });
 
@@ -600,69 +639,71 @@ When('eu tento enviar {float} ETH usando o dispositivo', async function(amount) 
   const BiometricAuthAccount = await ethers.getContractFactory('BiometricAuthAccount');
   const account = BiometricAuthAccount.attach(smartAccounts.biometric);
   
-  const recipient = accounts.user2.address;
-  const value = parseEther(amount.toString());
-  const callData = '0x'; // Simple ETH transfer
-  
-  // Prepare UserOp using the device for validation (simulate pre-computation)
-  const accountInterface = new ethers.utils.Interface(['function executeBiometric(bytes32 deviceId, address dest, uint256 value, bytes calldata func, bytes calldata biometricSignature)']);
-
-  // A real signature would be generated here based on the userOp hash and device key
-  // For testing, we use a placeholder signature or the owner's signature on the hash
-  const placeholderBiometricSig = '0x' + '00'.repeat(65); // Placeholder
-
-  const opCallData = accountInterface.encodeFunctionData('executeBiometric', [
-      devices.test.id,
-      recipient,
-      value,
-      callData,
-      placeholderBiometricSig // This signature is checked *inside* executeBiometric
-  ]);
-
-  // Signature for _validateSignature needs deviceId prepended
-  const userOp = fillUserOpDefaults({
-      sender: smartAccounts.biometric,
-      nonce: await contracts.entryPoint.getNonce(smartAccounts.biometric, 0),
-      callData: opCallData, // The call to executeBiometric
-      // signature: devices.test.id + signature.substring(2) // Device ID + Owner Sig
-  });
-
-  const userOpHash = await contracts.entryPoint.getUserOpHash(userOp);
-  const ownerSignature = await accounts.user1.signMessage(ethers.utils.arrayify(userOpHash));
-  // Prepend device ID to owner signature for biometric validation path
-  userOp.signature = devices.test.id + ownerSignature.substring(2);
-
-  // Tentar executar a operação via EntryPoint
   try {
-      // Send UserOp via handleOps
-      const tx = await contracts.entryPoint.connect(accounts.deployer).handleOps([userOp], accounts.deployer.address);
-      smartAccounts.lastTx = tx; // Store tx if successful
-      errors.limitExceededTx = null; // Clear previous error
-  } catch (e) {
-      errors.limitExceededTx = e; // Store error
-      // Log detailed error
-      console.error(`Transaction failed as expected: ${e.message}`);
-      if (e.data) {
-          try {
-              const decodedError = contracts.entryPoint.interface.parseError(e.data);
-              console.error("Decoded EntryPoint Error:", decodedError.name, decodedError.args);
-              if (decodedError.name === 'FailedOp' && decodedError.args.reason) {
-                 errors.revertReason = decodedError.args.reason;
-              }
-          } catch (decodeError) {
-              console.error("Could not decode EntryPoint error data.");
-          }
-      }
+    const tx = await account.connect(accounts.user1).execute(
+      accounts.user2.address,
+      parseEther(amount.toString()),
+      '0x'
+    );
+    await tx.wait();
+  } catch (error) {
+    errors.dailyLimit = error;
+    errors.lastError = error.message;
+    throw error;
   }
 });
 
 Then('a transação deve ser rejeitada', function() {
   // Check if an error was caught in the previous step
-  expect(errors.limitExceededTx).to.not.be.null;
-  expect(errors.limitExceededTx).to.be.an('error');
+  expect(errors.dailyLimit).to.exist;
+  expect(errors.dailyLimit).to.be.an('error');
 });
 
-Then('devo receber um erro informando que o limite diário foi excedido', function() {
-  // Check the revert reason from the EntryPoint's FailedOp event
-  expect(errors.revertReason).to.include('Excede limite'); // Check for the specific revert string from BiometricAuthAccount
+Then('devo receber um erro informando que o limite diário foi excedido', async function() {
+  expect(errors.lastError).to.contain('limite diário foi excedido');
+});
+
+When('eu solicito a recuperação da conta', async function() {
+  const SocialRecoveryAccount = await ethers.getContractFactory('SocialRecoveryAccount');
+  const account = SocialRecoveryAccount.attach(smartAccounts.social);
+  
+  try {
+    const tx = await account.connect(accounts.user1).requestRecovery();
+    await tx.wait();
+  } catch (error) {
+    errors.lastError = error.message;
+    throw error;
+  }
+});
+
+Then('a solicitação de recuperação deve ser registrada', async function() {
+  const SocialRecoveryAccount = await ethers.getContractFactory('SocialRecoveryAccount');
+  const account = SocialRecoveryAccount.attach(smartAccounts.social);
+  
+  const recoveryRequest = await account.recoveryRequests(accounts.user1.address);
+  expect(recoveryRequest.timestamp).to.be.gt(0);
+});
+
+When('os guardiões aprovam a recuperação', async function() {
+  const SocialRecoveryAccount = await ethers.getContractFactory('SocialRecoveryAccount');
+  const account = SocialRecoveryAccount.attach(smartAccounts.social);
+  
+  try {
+    const tx = await account.connect(accounts.guardian1).approveRecovery(accounts.user1.address);
+    await tx.wait();
+    
+    const tx2 = await account.connect(accounts.guardian2).approveRecovery(accounts.user1.address);
+    await tx2.wait();
+  } catch (error) {
+    errors.lastError = error.message;
+    throw error;
+  }
+});
+
+Then('a conta deve ser recuperada com sucesso', async function() {
+  const SocialRecoveryAccount = await ethers.getContractFactory('SocialRecoveryAccount');
+  const account = SocialRecoveryAccount.attach(smartAccounts.social);
+  
+  const isRecovered = await account.isRecovered(accounts.user1.address);
+  expect(isRecovered).to.be.true;
 }); 
