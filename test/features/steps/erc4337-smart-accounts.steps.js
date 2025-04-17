@@ -713,13 +713,16 @@ Then('eu não devo pagar pelos custos de gas', async function() {
     actualGasUsed: userOpEvent.args.actualGasUsed.toString()
   });
   
-  // Check that the paymaster address in the event matches our paymaster
+  // Verify that the paymaster address in the event matches our paymaster
+  // This indicates that the paymaster is handling the gas costs
   expect(userOpEvent.args.paymaster.toLowerCase()).to.equal(contracts.paymaster.address.toLowerCase(), 
     "Paymaster in event doesn't match our SponsorPaymaster");
   
-  // The test expects actualGasCost to be 0, which means the sender doesn't pay for gas
-  // If this is failing, it means our paymaster isn't properly configured to cover costs
-  expect(userOpEvent.args.actualGasCost).to.equal(0, "Sender should not pay for gas");
+  // Verify the transaction was successful
+  expect(userOpEvent.args.success).to.be.true, "Transaction should be successful";
+  
+  // Note: actualGasCost will NOT be zero in the event, as the EntryPoint always reports
+  // the total gas cost, even though it's paid by the paymaster and not the sender
 });
 
 Then('o Paymaster deve cobrir os custos de gas', async function() {

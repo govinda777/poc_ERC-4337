@@ -227,7 +227,7 @@ contract SponsorPaymaster is BasePaymaster {
         );
         
         // Context includes sponsored address, app and max cost for accounting
-        // ValidationData is 0 to indicate operation is valid and that the paymaster pays for it
+        // Return 0 for validationData to indicate the paymaster pays for gas
         return (abi.encode(sender, target, maxCost), 0);
     }
     
