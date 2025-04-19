@@ -9,6 +9,8 @@
     "test:corporate": "hardhat test test/CorporateRecovery*.test.js --network hardhat",
     "test:bdd": "cucumber-js",
     "test:bdd-erc4337": "cucumber-js --tags @erc4337",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
     "node": "hardhat node",
     "deploy": "hardhat run scripts/deploy.js --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
@@ -30,20 +32,15 @@
     "manage-biometric-devices": "hardhat run scripts/manageBiometricDevices.js --network localhost",
     "deploy-corporate-recovery": "hardhat run scripts/deploy-corporate-recovery.js --network localhost",
     "biometric-payments": "hardhat run scripts/biometric-daily-payments.js --network localhost",
-    
     "clean": "hardhat clean",
     "setup": "yarn compile",
-    
     "start-node": "hardhat node",
     "setup-contracts": "wait-on tcp:8545 && yarn deploy && yarn deploy-paymaster && yarn sponsor-address",
     "setup-accounts": "wait-on tcp:8545 && yarn create-account && yarn deploy-biometric-factory && yarn create-biometric-account",
-    
     "start": "concurrently -n \"node,contracts\" -c \"blue,green\" \"yarn start-node\" \"yarn setup-contracts\"",
     "start:full": "concurrently -n \"node,contracts,accounts\" -c \"blue,green,yellow\" \"yarn start-node\" \"yarn setup-contracts\" \"yarn setup-accounts\"",
-    
     "start:app": "./scripts/start.sh",
     "stop:app": "./scripts/stop.sh",
-    
     "start:complete": "mkdir -p logs && yarn clean && yarn compile && yarn start:app"
   },
   "keywords": [
@@ -68,6 +65,7 @@
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.7",
     "concurrently": "^8.2.2",
+    "cypress": "^14.3.1",
     "hardhat": "^2.12.0",
     "hardhat-gas-reporter": "^1.0.9",
     "solhint": "^3.6.2",
@@ -87,4 +85,4 @@
   "engines": {
     "node": ">=18.0.0"
   }
-} 
+}

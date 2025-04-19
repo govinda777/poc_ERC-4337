@@ -1,0 +1,30 @@
+{
+  "mockAccountAddress": "0x1234567890123456789012345678901234567890",
+  "mockOwnerAddress": "0xabc1234567890123456789012345678901234def",
+  "mockOracleAddress": "0x9876543210987654321098765432109876543210",
+  "mockRescueDestination": "0xabcdef1234567890abcdef1234567890abcdef12",
+  "initialEthPrice": 2000,
+  "triggerPrice": 1600,
+  "depositAmount": "0.5",
+  "accountBalance": "1.5",
+  "liquidationSettings": {
+    "priceChangeThreshold": 20,
+    "checkInterval": "4 hours"
+  },
+  "mockPrices": [
+    {"timestamp": "2023-10-01T10:00:00Z", "price": 2000, "canLiquidate": false},
+    {"timestamp": "2023-10-01T12:00:00Z", "price": 1900, "canLiquidate": false},
+    {"timestamp": "2023-10-01T14:00:00Z", "price": 1800, "canLiquidate": false},
+    {"timestamp": "2023-10-01T16:00:00Z", "price": 1700, "canLiquidate": false},
+    {"timestamp": "2023-10-01T18:00:00Z", "price": 1590, "canLiquidate": true},
+    {"timestamp": "2023-10-01T20:00:00Z", "price": 1500, "canLiquidate": true}
+  ],
+  "liquidationHistory": {
+    "timestamp": "2023-10-01T18:05:23Z",
+    "triggerPrice": 1600,
+    "actualPrice": 1590,
+    "amountRescued": "1.5",
+    "rescueDestination": "0xabcdef1234567890abcdef1234567890abcdef12",
+    "transactionHash": "0xabc123def456789012345678901234567890123456789012345678901234567890"
+  }
+} 
